@@ -1,0 +1,59 @@
+[gd_resource type="MeshLibrary" load_steps=10 format=3 uid="uid://54tpx8cmksfc"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_o74e3"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7ovco"]
+albedo_color = Color(0, 0.95, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_yub4l"]
+material = SubResource("StandardMaterial3D_7ovco")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6xsea"]
+albedo_color = Color(1, 0.483333, 0, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_drrto"]
+material = SubResource("StandardMaterial3D_6xsea")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bwbyx"]
+albedo_color = Color(0, 0, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_rafp0"]
+material = SubResource("StandardMaterial3D_bwbyx")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kv5lq"]
+albedo_color = Color(0, 0, 0, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_7r0fe"]
+material = SubResource("StandardMaterial3D_kv5lq")
+
+[resource]
+item/0/name = "normal"
+item/0/mesh = SubResource("BoxMesh_o74e3")
+item/0/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/0/shapes = []
+item/0/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/0/navigation_layers = 1
+item/1/name = "hover"
+item/1/mesh = SubResource("BoxMesh_yub4l")
+item/1/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/1/shapes = []
+item/1/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/1/navigation_layers = 1
+item/2/name = "start"
+item/2/mesh = SubResource("BoxMesh_drrto")
+item/2/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/2/shapes = []
+item/2/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/2/navigation_layers = 1
+item/3/name = "end"
+item/3/mesh = SubResource("BoxMesh_rafp0")
+item/3/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/3/shapes = []
+item/3/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/3/navigation_layers = 1
+item/4/name = "non-walkable"
+item/4/mesh = SubResource("BoxMesh_7r0fe")
+item/4/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/4/shapes = []
+item/4/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/4/navigation_layers = 1

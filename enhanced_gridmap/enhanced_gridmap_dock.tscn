@@ -1,0 +1,224 @@
+[gd_scene load_steps=2 format=3 uid="uid://bnkcae3aoavgh"]
+
+[ext_resource type="Script" path="res://addons/enhanced_gridmap/enhanced_gridmap_dock.gd" id="1_..."]
+
+[node name="Enhanced GridMap" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_...")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Enhanced Grid Map"
+
+[node name="-" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Columns" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Columns"]
+layout_mode = 2
+text = "Columns:"
+
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/Columns"]
+layout_mode = 2
+min_value = 1.0
+value = 10.0
+
+[node name="Rows" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Rows"]
+layout_mode = 2
+text = "Rows:"
+
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/Rows"]
+layout_mode = 2
+min_value = 1.0
+value = 10.0
+
+[node name="AutoGenerate" type="CheckBox" parent="VBoxContainer"]
+layout_mode = 2
+text = "Auto Generate"
+
+[node name="GenerateButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Generate Grid"
+
+[node name="ClearButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Clear Grid"
+
+[node name="RandomizeButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Randomize Grid"
+
+[node name="QuickFillLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Quick Fill"
+
+[node name="--" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="FillOptions" type="OptionButton" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="FillButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Fill Grid"
+
+[node name="CellMapLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Cell Map"
+
+[node name="---" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="GridContainer" type="VBoxContainer" parent="VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ItemStates" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="NormalItem" type="HBoxContainer" parent="VBoxContainer/ItemStates"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/ItemStates/NormalItem"]
+layout_mode = 2
+text = "Normal Item:"
+
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/ItemStates/NormalItem"]
+layout_mode = 2
+min_value = 0
+max_value = 100
+value = 0
+
+[node name="HoverItem" type="HBoxContainer" parent="VBoxContainer/ItemStates"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/ItemStates/HoverItem"]
+layout_mode = 2
+text = "Hover Item:"
+
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/ItemStates/HoverItem"]
+layout_mode = 2
+min_value = 0
+max_value = 100
+value = 1
+
+[node name="StartItem" type="HBoxContainer" parent="VBoxContainer/ItemStates"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/ItemStates/StartItem"]
+layout_mode = 2
+text = "Start Item:"
+
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/ItemStates/StartItem"]
+layout_mode = 2
+min_value = 0
+max_value = 100
+value = 2
+
+[node name="EndItem" type="HBoxContainer" parent="VBoxContainer/ItemStates"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/ItemStates/EndItem"]
+layout_mode = 2
+text = "End Item:"
+
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/ItemStates/EndItem"]
+layout_mode = 2
+min_value = 0
+max_value = 100
+value = 3
+
+[node name="NonWalkableItem" type="HBoxContainer" parent="VBoxContainer/ItemStates"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/ItemStates/NonWalkableItem"]
+layout_mode = 2
+text = "Non-Walkable Item:"
+
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/ItemStates/NonWalkableItem"]
+layout_mode = 2
+min_value = 0
+max_value = 100
+value = 4
+
+[node name="AStarContainer" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="AStarLabel" type="Label" parent="VBoxContainer/AStarContainer"]
+layout_mode = 2
+text = "A* Pathfinding"
+
+[node name="StartX" type="HBoxContainer" parent="VBoxContainer/AStarContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/AStarContainer/StartX"]
+layout_mode = 2
+text = "Start X:"
+
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/AStarContainer/StartX"]
+layout_mode = 2
+max_value = 9.0
+
+[node name="StartZ" type="HBoxContainer" parent="VBoxContainer/AStarContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/AStarContainer/StartZ"]
+layout_mode = 2
+text = "Start Z:"
+
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/AStarContainer/StartZ"]
+layout_mode = 2
+max_value = 9.0
+
+[node name="EndX" type="HBoxContainer" parent="VBoxContainer/AStarContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/AStarContainer/EndX"]
+layout_mode = 2
+text = "End X:"
+
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/AStarContainer/EndX"]
+layout_mode = 2
+max_value = 9.0
+
+[node name="EndZ" type="HBoxContainer" parent="VBoxContainer/AStarContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/AStarContainer/EndZ"]
+layout_mode = 2
+text = "End Z:"
+
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/AStarContainer/EndZ"]
+layout_mode = 2
+max_value = 9.0
+
+[node name="FindPathButton" type="Button" parent="VBoxContainer/AStarContainer"]
+layout_mode = 2
+text = "Find Path"
+
+[node name="PathResultLabel" type="Label" parent="VBoxContainer/AStarContainer"]
+layout_mode = 2
+text = "Path Result:"
