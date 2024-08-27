@@ -25,6 +25,9 @@ var path = []
 # Item states
 enum ItemState {NORMAL, HOVER, START, END, NON_WALKABLE}
 
+# Add this to the class variables
+var diagonal_movement: bool = false
+
 func _ready():
 	mesh_library_changed.connect(_on_mesh_library_changed)
 	if not Engine.is_editor_hint() and auto_generate:
@@ -113,6 +116,36 @@ func randomize_grid():
 	update_astar_costs()
 	emit_signal("grid_updated")
 
+func randomize_grid_custom(randomize_states: Array):
+	if not mesh_library:
+		print("Error: No MeshLibrary assigned to GridMap")
+		return
+
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+
+	for x in range(columns):
+		for z in range(rows):
+			var random_value = rng.randf() * 100  # Generate a random number between 0 and 100
+			var accumulated_percentage = 0
+			var selected_state = null
+
+			for state in randomize_states:
+				accumulated_percentage += state.randomize_percentage
+				if random_value <= accumulated_percentage:
+					selected_state = state
+					break
+
+			if selected_state:
+				set_cell_from_data(x, z, selected_state.id)
+			else:
+				set_cell_from_data(x, z, randomize_states[0].id)  # Default to the first state if no match
+
+	update_grid_data()
+	initialize_astar()
+	update_astar_costs()
+	emit_signal("grid_updated")
+
 func fill_grid(item_index: int):
 	if not mesh_library:
 		print("No MeshLibrary assigned to GridMap")
@@ -149,10 +182,6 @@ func update_grid_data():
 		grid_data.append(row)
 	emit_signal("grid_updated")
 
-#func set_cell_from_data(x: int, z: int, item_index: int):
-	#if x >= 0 and x < columns and z >= 0 and z < rows:
-		#set_cell_item(Vector3i(x, 0, z), item_index)
-		#grid_data[z][x] = item_index
 
 func set_cell_from_data(x: int, z: int, item_index: int):
 	if x >= 0 and x < columns and z >= 0 and z < rows:
@@ -175,6 +204,7 @@ func set_cell_from_data(x: int, z: int, item_index: int):
 			astar.set_point_weight_scale(point_id, cost)
 
 # New A* Pathfinding functions
+# Modify the initialize_astar function
 func initialize_astar():
 	astar.clear()
 	for x in range(columns):
@@ -187,8 +217,20 @@ func initialize_astar():
 				astar.connect_points(point_id, point_id - 1)
 			if z > 0:
 				astar.connect_points(point_id, point_id - columns)
+			
+			# Add diagonal connections if diagonal movement is enabled
+			if diagonal_movement:
+				if x > 0 and z > 0:
+					astar.connect_points(point_id, point_id - columns - 1)  # Top-left
+				if x < columns - 1 and z > 0:
+					astar.connect_points(point_id, point_id - columns + 1)  # Top-right
 	
 	update_astar_costs()
+
+# Add this function to toggle diagonal movement
+func set_diagonal_movement(enable: bool):
+	diagonal_movement = enable
+	initialize_astar()  # Reinitialize the A* graph with new connections
 
 func set_point_solid(x: int, z: int, is_solid: bool):
 	var point_id = z * columns + x

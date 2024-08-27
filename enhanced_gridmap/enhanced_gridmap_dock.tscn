@@ -1,29 +1,25 @@
 [gd_scene load_steps=2 format=3 uid="uid://bnkcae3aoavgh"]
 
-[ext_resource type="Script" path="res://addons/enhanced_gridmap/enhanced_gridmap_dock.gd" id="1_..."]
+[ext_resource type="Script" path="res://addons/enhanced_gridmap/enhanced_gridmap_dock.gd" id="1_abcde"]
 
-[node name="Enhanced GridMap" type="Control"]
-layout_mode = 3
+[node name="Enhanced GridMap" type="ScrollContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_...")
+script = ExtResource("1_abcde")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [node name="TitleLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-text = "Enhanced Grid Map"
+text = "☕︎ Enhanced Grid Map"
 
-[node name="-" type="HSeparator" parent="VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
 layout_mode = 2
 
 [node name="Columns" type="HBoxContainer" parent="VBoxContainer"]
@@ -54,23 +50,19 @@ value = 10.0
 layout_mode = 2
 text = "Auto Generate"
 
-[node name="GenerateButton" type="Button" parent="VBoxContainer"]
-layout_mode = 2
-text = "Generate Grid"
-
 [node name="ClearButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "Clear Grid"
 
-[node name="RandomizeButton" type="Button" parent="VBoxContainer"]
+[node name="GenerateButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
-text = "Randomize Grid"
+text = "Generate Grid"
 
 [node name="QuickFillLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 text = "Quick Fill"
 
-[node name="--" type="HSeparator" parent="VBoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="VBoxContainer"]
 layout_mode = 2
 
 [node name="FillOptions" type="OptionButton" parent="VBoxContainer"]
@@ -84,14 +76,15 @@ text = "Fill Grid"
 layout_mode = 2
 text = "Cell Map"
 
-[node name="---" type="HSeparator" parent="VBoxContainer"]
+[node name="HSeparator3" type="HSeparator" parent="VBoxContainer"]
 layout_mode = 2
 
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
+[node name="GridScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="GridContainer" type="VBoxContainer" parent="VBoxContainer/ScrollContainer"]
+[node name="GridContainer" type="VBoxContainer" parent="VBoxContainer/GridScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -99,7 +92,22 @@ size_flags_vertical = 3
 [node name="ItemStates" type="VBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 
+[node name="MeshLibraryLabel" type="Label" parent="VBoxContainer/ItemStates"]
+layout_mode = 2
+text = "Mesh Library"
+
+[node name="HSeparator4" type="HSeparator" parent="VBoxContainer/ItemStates"]
+layout_mode = 2
+
+[node name="ItemStatesContainer" type="VBoxContainer" parent="VBoxContainer/ItemStates"]
+layout_mode = 2
+
+[node name="AddItemStateButton" type="Button" parent="VBoxContainer/ItemStates"]
+layout_mode = 2
+text = "Add New Item State"
+
 [node name="NormalItem" type="HBoxContainer" parent="VBoxContainer/ItemStates"]
+visible = false
 layout_mode = 2
 
 [node name="Label" type="Label" parent="VBoxContainer/ItemStates/NormalItem"]
@@ -108,11 +116,9 @@ text = "Normal Item:"
 
 [node name="SpinBox" type="SpinBox" parent="VBoxContainer/ItemStates/NormalItem"]
 layout_mode = 2
-min_value = 0
-max_value = 100
-value = 0
 
 [node name="HoverItem" type="HBoxContainer" parent="VBoxContainer/ItemStates"]
+visible = false
 layout_mode = 2
 
 [node name="Label" type="Label" parent="VBoxContainer/ItemStates/HoverItem"]
@@ -121,11 +127,10 @@ text = "Hover Item:"
 
 [node name="SpinBox" type="SpinBox" parent="VBoxContainer/ItemStates/HoverItem"]
 layout_mode = 2
-min_value = 0
-max_value = 100
-value = 1
+value = 1.0
 
 [node name="StartItem" type="HBoxContainer" parent="VBoxContainer/ItemStates"]
+visible = false
 layout_mode = 2
 
 [node name="Label" type="Label" parent="VBoxContainer/ItemStates/StartItem"]
@@ -134,11 +139,10 @@ text = "Start Item:"
 
 [node name="SpinBox" type="SpinBox" parent="VBoxContainer/ItemStates/StartItem"]
 layout_mode = 2
-min_value = 0
-max_value = 100
-value = 2
+value = 2.0
 
 [node name="EndItem" type="HBoxContainer" parent="VBoxContainer/ItemStates"]
+visible = false
 layout_mode = 2
 
 [node name="Label" type="Label" parent="VBoxContainer/ItemStates/EndItem"]
@@ -147,11 +151,10 @@ text = "End Item:"
 
 [node name="SpinBox" type="SpinBox" parent="VBoxContainer/ItemStates/EndItem"]
 layout_mode = 2
-min_value = 0
-max_value = 100
-value = 3
+value = 3.0
 
 [node name="NonWalkableItem" type="HBoxContainer" parent="VBoxContainer/ItemStates"]
+visible = false
 layout_mode = 2
 
 [node name="Label" type="Label" parent="VBoxContainer/ItemStates/NonWalkableItem"]
@@ -160,9 +163,11 @@ text = "Non-Walkable Item:"
 
 [node name="SpinBox" type="SpinBox" parent="VBoxContainer/ItemStates/NonWalkableItem"]
 layout_mode = 2
-min_value = 0
-max_value = 100
-value = 4
+value = 4.0
+
+[node name="RandomizeButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Randomize Grid"
 
 [node name="AStarContainer" type="VBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
@@ -170,6 +175,13 @@ layout_mode = 2
 [node name="AStarLabel" type="Label" parent="VBoxContainer/AStarContainer"]
 layout_mode = 2
 text = "A* Pathfinding"
+
+[node name="HSeparator5" type="HSeparator" parent="VBoxContainer/AStarContainer"]
+layout_mode = 2
+
+[node name="DiagonalMovement" type="CheckBox" parent="VBoxContainer/AStarContainer"]
+layout_mode = 2
+text = "Diagonal Movement"
 
 [node name="StartX" type="HBoxContainer" parent="VBoxContainer/AStarContainer"]
 layout_mode = 2
@@ -222,3 +234,4 @@ text = "Find Path"
 [node name="PathResultLabel" type="Label" parent="VBoxContainer/AStarContainer"]
 layout_mode = 2
 text = "Path Result:"
+autowrap_mode = 2
