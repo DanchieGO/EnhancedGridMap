@@ -1,122 +1,350 @@
-# Enhanced GridMap Plugin for Godot
+# EnhancedGridMap Plugin for Godot 4.3
 
-This plugin extends Godot's GridMap functionality, providing an intuitive interface for creating, editing, and pathfinding on grid-based maps.
+## Overview
+
+EnhancedGridMap is a powerful plugin for Godot 4.3 that extends the functionality of the built-in GridMap node. It provides additional features for grid-based game development, including custom cell states, A* pathfinding, and an intuitive editor interface.
 
 ## Features
 
-- Dynamic grid generation and manipulation
-- A* pathfinding visualization
-- Customizable cell states (normal, hover, start, end, non-walkable)
-- Random grid generation
-- Fill grid with specific items
-- UI for easy grid manipulation
+- Custom grid size (columns and rows)
+- Auto-generation of grid
+- Custom cell states with visual representation
+- A* pathfinding with diagonal movement option
+- Randomization of grid cells
+- Fill grid with specific cell types
+- Editor dock for easy manipulation of grid properties
 
 ## Installation
 
-1. Clone this repository or download the ZIP file.
-2. Copy the `addons/enhanced_gridmap` folder into your Godot project's `addons` folder.
-3. Enable the plugin in your Godot project:
-   - Go to "Project" -> "Project Settings" -> "Plugins"
-   - Find "Enhanced GridMap" in the list and check the "Enable" box
+1. Copy the `enhanced_gridmap` folder into your Godot project's `addons` directory.
+2. Enable the plugin in Project Settings > Plugins.
 
-## Setup
+## EnhancedGridMap Dock
 
-1. Add a new EnhancedGridMap node to your scene.
-2. In the Inspector, assign a MeshLibrary to the EnhancedGridMap node.
-   - Ensure your MeshLibrary has at least 5 items for normal, hover, start, end, and non-walkable states.
-3. Adjust the columns and rows properties to set the grid size.
-4. Set the auto_generate property to true if you want the grid to generate automatically.
+The EnhancedGridMap Dock provides a user-friendly interface to control and manipulate the EnhancedGridMap node. Here's a detailed explanation of all features available in the dock:
 
-## Usage
+### Grid Properties
 
-### Basic Grid Manipulation
+1. **Columns**: Set the number of columns in the grid.
+2. **Rows**: Set the number of rows in the grid.
+3. **Auto Generate**: Toggle automatic grid generation when properties change.
 
-- Use the Columns and Rows spinboxes to adjust the grid size.
-- Click "Generate" to create the grid based on current settings.
-- Click "Clear" to remove all items from the grid.
-- Use "Randomize" to fill the grid with random normal and non-walkable cells.
-- Select an item from the "Fill Options" dropdown and click "Fill" to set all cells to that item.
+### Grid Operations
 
-### Cell Editing
+1. **Generate**: Manually generate the grid based on current properties.
+2. **Clear**: Remove all cells from the grid.
+3. **Randomize**: Randomly assign cell types based on defined states.
+4. **Fill**: Fill the entire grid with a specific cell type.
 
-- In the grid view, click on any cell to open a dropdown menu.
-- Select the desired item from the dropdown to change the cell's content.
+### Cell States
+
+The dock allows you to define and manage custom cell states:
+
+1. **Default States**:
+   - Normal
+   - Hover
+   - Start
+   - End
+   - Non-Walkable
+
+2. **Custom States**:
+   - Add new states with the "Add Item State" button.
+   - For each state, you can set:
+     - Name
+     - ID (used in scripts to reference the state)
+     - Include in Randomize (toggle)
+     - Randomize Percentage (when included in randomization)
+
+3. **State Management**:
+   - Edit existing states
+   - Remove custom states
 
 ### A* Pathfinding
 
-1. Set the start position using the "Start X" and "Start Z" spinboxes.
-2. Set the end position using the "End X" and "End Z" spinboxes.
-3. Click "Find Path" to calculate and visualize the path.
-4. The path result will be displayed below the button.
+1. **Start Position**: Set the X and Z coordinates for the pathfinding start point.
+2. **End Position**: Set the X and Z coordinates for the pathfinding end point.
+3. **Find Path**: Calculate and visualize the path between start and end points.
+4. **Diagonal Movement**: Toggle to allow diagonal movement in pathfinding.
 
-### Customizing Item States
+### Visual Grid Editor
 
-Use the spinboxes in the "Item States" section to set which item index corresponds to each state:
+The dock includes a visual representation of the grid:
 
-- Normal Item
-- Hover Item
-- Start Item
-- End Item
-- Non-walkable Item
+1. Each cell displays its coordinates.
+2. Drop-down menus in each cell allow you to change the cell's state directly.
 
-Ensure these indices match the order of items in your MeshLibrary.
+## In-Depth Feature Explanation
 
-## Notes
+### Custom Grid Generation
 
-- The plugin automatically updates the A* pathfinding data when you modify the grid.
-- Non-walkable cells are considered obstacles in pathfinding.
-- The visualized path uses the "Hover Item" to show intermediate steps.
+The EnhancedGridMap allows for flexible grid generation:
 
-## API
+1. **Auto-generation**: The grid can automatically update when properties change.
+2. **Manual generation**: Use the `generate_grid()` method for custom generation logic.
+3. **Clear and regenerate**: Useful for level resets or procedural generation.
 
-The EnhancedGridMap class provides several reusable functions for grid manipulation and pathfinding. Here's a list of the key functions and their usage:
+### Cell States
+
+Cell states are central to the EnhancedGridMap's functionality:
+
+1. **Default states**: Predefined states for common use cases (normal, hover, start, end, non-walkable).
+2. **Custom states**: Create states for specific game mechanics (e.g., water, lava, ice).
+3. **State properties**:
+   - ID: Used in scripts to set or check cell states.
+   - Randomize inclusion: Determine if the state should be included in randomization.
+   - Randomize percentage: Control the frequency of the state when randomizing.
+
+### A* Pathfinding
+
+The integrated A* pathfinding system offers:
+
+1. **Efficient pathfinding**: Quickly find optimal paths between two points.
+2. **Diagonal movement**: Option to allow or disallow diagonal movement.
+3. **Custom cost functions**: Override `get_cell_cost()` for complex movement rules.
+4. **Path visualization**: Easily visualize calculated paths for debugging.
 
 ### Grid Manipulation
 
-#### `generate_grid()`
-Generates a new grid based on the current columns and rows settings.  
+Several methods for manipulating the grid:
+
+1. **`set_cell_from_data(x, z, item_index)`**: Set a specific cell's state.
+2. **`fill_grid(item_index)`**: Fill the entire grid with a specific state.
+3. **`randomize_grid()`**: Randomly assign states based on defined probabilities.
+4. **`randomize_grid_custom(randomize_states)`**: Use custom randomization rules.
+
+### Extending Functionality
+
+The EnhancedGridMap is designed to be easily extended:
+
+1. **Custom grid generation**: Override `generate_grid()` for specialized layouts.
+2. **Custom pathfinding costs**: Implement `get_cell_cost()` for complex movement rules.
+3. **Integration with game mechanics**: Use signals like `grid_updated` to trigger game events.
+
+### Editor Integration
+
+The plugin seamlessly integrates with the Godot editor:
+
+1. **Visual editing**: Manipulate the grid directly in the editor viewport.
+2. **Real-time updates**: Changes in the dock immediately reflect in the scene.
+3. **Custom inspector**: The EnhancedGridMap node has a custom inspector for easy property editing.
+
+## Plugin Usage
+
+### Basic Setup
+
+1. Add an `EnhancedGridMap` node to your scene.
+2. Assign a `MeshLibrary` to the `EnhancedGridMap`.
+3. Use the `EnhancedGridMap` dock in the editor to configure grid properties and cell states.
+
+### Scripting
+
+You can also interact with the `EnhancedGridMap` through GDScript. Here's a basic example:
+
 ```gdscript
+var enhanced_gridmap = $EnhancedGridMap
+
+# Generate a 10x10 grid
+enhanced_gridmap.columns = 10
+enhanced_gridmap.rows = 10
 enhanced_gridmap.generate_grid()
+
+# Find a path from (0,0) to (5,5)
+var path = enhanced_gridmap.find_path(Vector2(0, 0), Vector2(5, 5))
 ```
 
-#### `clear_grid()`
-Clears all items from the grid.  
+## Sample Scene and Player Movement
+
+The plugin includes a sample scene that demonstrates how to implement player movement using the EnhancedGridMap. This scene showcases pathfinding and grid-based movement.
+
+### Scene Setup
+
+The sample scene (`main.tscn`) includes:
+
+1. An `EnhancedGridMap` node with a pre-configured grid.
+2. A player character `CharacterBody3D` with a custom script for grid-based movement.
+3. A top-down camera for easy visualization.
+
+### Player Movement Script
+
+The `player.gd` script provides a flexible implementation of grid-based movement using the EnhancedGridMap. Key features include:
+
+- Click-to-move functionality
+- Pathfinding using the EnhancedGridMap's A* algorithm
+- Smooth movement along the calculated path
+- Customizable cell size and offset
+- Option for diagonal movement
+
+### Usage Example
+
+To use the player movement script in your own scene:
+
+1. Add an `EnhancedGridMap` to your scene.
+2. Add a `CharacterBody3D` (or other suitable node) for your player.
+3. Attach the `player.gd` script to your player node.
+4. Set the `enhanced_gridmap_path` and `player_path` in the inspector.
+5. Customize other properties like `cell_size` and `use_diagonal_movement` as needed.
+
+Here's a minimal setup example:
+
 ```gdscript
-enhanced_gridmap.clear_grid()
+extends Node3D
+
+@onready var enhanced_gridmap = $EnhancedGridMap
+@onready var player = $Player
+
+func _ready():
+    player.enhanced_gridmap_path = enhanced_gridmap.get_path()
+    player.player_path = player.get_path()
+    player.cell_size = Vector3(2, 2, 2)
+    player.use_diagonal_movement = true
 ```
 
-#### `randomize_grid()`
-Fills the grid with random normal and non-walkable cells.  
+This setup allows for click-to-move functionality on your EnhancedGridMap, with the player finding and following optimal paths while avoiding non-walkable cells.
+
+## API Reference
+
+### Properties
+
+- `columns: int` - Number of columns in the grid
+- `rows: int` - Number of rows in the grid
+- `auto_generate: bool` - Whether to automatically generate the grid when properties change
+- `normal_item: int` - Item index for normal cells
+- `hover_item: int` - Item index for hover state cells
+- `start_item: int` - Item index for pathfinding start cells
+- `end_item: int` - Item index for pathfinding end cells
+- `non_walkable_item: int` - Item index for non-walkable cells
+- `diagonal_movement: bool` - Whether to allow diagonal movement in pathfinding
+
+### Methods
+
+#### Grid Management
+
+- `generate_grid()` - Generate the grid based on current properties
+- `clear_grid()` - Clear all cells in the grid
+- `randomize_grid()` - Randomize cell types in the grid
+- `randomize_grid_custom(randomize_states: Array)` - Randomize cell types based on custom states
+- `fill_grid(item_index: int)` - Fill the entire grid with a specific item type
+
+#### Cell Manipulation
+
+- `set_cell_from_data(x: int, z: int, item_index: int)` - Set a specific cell's item type
+- `get_cell_cost(x: int, z: int) -> float` - Get the cost of moving through a specific cell
+
+#### Pathfinding
+
+- `find_path(start: Vector2, end: Vector2) -> Array` - Find a path between two points
+- `set_diagonal_movement(enable: bool)` - Enable or disable diagonal movement in pathfinding
+- `set_point_solid(x: int, z: int, is_solid: bool)` - Set whether a point is solid (non-walkable) for pathfinding
+
+### Signals
+
+- `mesh_library_changed` - Emitted when the MeshLibrary is changed
+- `grid_updated` - Emitted when the grid is updated
+
+### Example Scene : Player Movement API
+
+Here are the main properties and methods of the player movement script:
+
+#### Properties
+
+- `enhanced_gridmap_path: NodePath` - Path to the EnhancedGridMap node
+- `player_path: NodePath` - Path to the player node
+- `cell_size: Vector3` - Size of each grid cell
+- `cell_offset: Vector3` - Offset applied to the player's position
+- `center_x: bool` - Center the player horizontally within the cell
+- `center_y: bool` - Center the player vertically within the cell
+- `center_z: bool` - Center the player depth-wise within the cell
+- `use_diagonal_movement: bool` - Allow diagonal movement in pathfinding
+
+#### Methods
+
+- `find_valid_starting_position() -> Vector2i` - Find a valid starting position on the grid
+- `move_player_to_clicked_position(grid_position: Vector2i)` - Move the player to a clicked grid position
+- `move_player_along_path(path: Array)` - Move the player along a calculated path
+- `update_player_position(grid_position: Vector2i)` - Update the player's position based on a grid position
+- `grid_to_world(grid_position: Vector2i) -> Vector3` - Convert a grid position to a world position
+
+## Extending the Plugin
+
+### Custom Item States
+
+You can add custom item states to the EnhancedGridMap:
+
+1. In the `EnhancedGridMap` dock, click the "Add Item State" button.
+2. Set a name, ID, and randomization properties for the new state.
+3. Use the new state's ID when setting cell types in your scripts.
+
+### Custom Pathfinding Costs
+
+Override the `get_cell_cost` method in a script extending EnhancedGridMap to implement custom pathfinding costs:
+
 ```gdscript
-enhanced_gridmap.randomize_grid()
+extends EnhancedGridMap
+
+func get_cell_cost(x: int, z: int) -> float:
+    var cell_item = get_cell_item(Vector3i(x, 0, z))
+    match cell_item:
+        0: return 1.0  # Normal cell
+        1: return 2.0  # Slow terrain
+        2: return 0.5  # Fast terrain
+        _: return INF  # Non-walkable
 ```
 
-#### `fill_grid(item_index: int)`
-Fills the entire grid with the specified item.  
+### Custom Grid Generation
+
+You can implement custom grid generation by overriding the `generate_grid` method:
+
 ```gdscript
-enhanced_gridmap.fill_grid(item_index)
+extends EnhancedGridMap
+
+func generate_grid():
+    clear()
+    for x in range(columns):
+        for z in range(rows):
+            var item_index = (x + z) % 2  # Checkerboard pattern
+            set_cell_item(Vector3i(x, 0, z), item_index)
+    update_grid_data()
+    initialize_astar()
+    update_astar_costs()
 ```
 
-#### `set_cell_from_data(x: int, z: int, item_index: int)`
-Sets a specific cell to the given item index.  
+## Extending the Player Movement
+
+You can extend the player movement functionality by overriding or adding methods to the `player.gd` script. For example:
+
+### Custom Movement Rules
+
 ```gdscript
-enhanced_gridmap.set_cell_from_data(x, z, item_index)
+extends "res://addons/enhanced_gridmap/examples/player.gd"
+
+func is_valid_move(from: Vector2i, to: Vector2i) -> bool:
+    # Add custom logic for valid moves
+    var distance = from.distance_to(to)
+    return distance <= 1 and super.is_valid_move(from, to)
 ```
 
-### Pathfinding
+### Additional Interactions
 
-#### `initialize_astar()`
-Initializes the A* pathfinding grid. Called automatically when generating or modifying the grid.  
 ```gdscript
-enhanced_gridmap.initialize_astar()
+extends "res://addons/enhanced_gridmap/examples/player.gd"
+
+func _unhandled_input(event):
+    super._unhandled_input(event)
+    
+    if event.is_action_pressed("interact"):
+        interact_with_current_cell()
+
+func interact_with_current_cell():
+    var cell_item = enhanced_gridmap.get_cell_item(Vector3i(current_position.x, 0, current_position.y))
+    # Add custom interaction logic based on cell_item
 ```
 
-#### `find_path(start: Vector2, end: Vector2) -> Array`
-Finds and returns a path between two points on the grid.  
-```gdscript
-var path = enhanced_gridmap.find_path(Vector2(start_x, start_z), Vector2(end_x, end_z))
-```
+These examples demonstrate how you can build upon the provided player movement script to create more complex game mechanics that integrate seamlessly with the EnhancedGridMap plugin.
+
+## Contributing
+
+Contributions to the EnhancedGridMap plugin are welcome! Please submit pull requests or issues on the project's GitHub repository.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This plugin is released under the MIT License. See the LICENSE file for details.
