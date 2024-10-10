@@ -9,11 +9,11 @@ signal grid_updated
 @export var rows: int = 10 : set = set_rows
 @export var auto_generate: bool = false : set = set_auto_generate
 
-@export var normal_item: int = 0
+@export var normal_items: Array[int] = [0]
+@export var non_walkable_items: Array[int] = [4]
 @export var hover_item: int = 1
 @export var start_item: int = 2
 @export var end_item: int = 3
-@export var non_walkable_item: int = 4
 
 var current_mesh_library: MeshLibrary
 var grid_data: Array = []
@@ -27,6 +27,7 @@ enum ItemState {NORMAL, HOVER, START, END, NON_WALKABLE}
 
 # Add this to the class variables
 var diagonal_movement: bool = false
+
 
 func _ready():
 	mesh_library_changed.connect(_on_mesh_library_changed)
@@ -44,11 +45,16 @@ func validate_item_indices():
 	var item_list = mesh_library.get_item_list()
 	var max_index = item_list.size() - 1
 	
-	normal_item = clamp(normal_item, 0, max_index)
+	normal_items = normal_items.filter(func(item): return item >= 0 and item <= max_index)
 	hover_item = clamp(hover_item, 0, max_index)
 	start_item = clamp(start_item, 0, max_index)
 	end_item = clamp(end_item, 0, max_index)
-	non_walkable_item = clamp(non_walkable_item, 0, max_index)
+	non_walkable_items = non_walkable_items.filter(func(item): return item >= 0 and item <= max_index)
+	
+	if normal_items.is_empty():
+		normal_items = [0]
+	if non_walkable_items.is_empty():
+		non_walkable_items = [max_index]
 
 func set_columns(value: int):
 	columns = value
@@ -85,7 +91,7 @@ func generate_grid():
 	
 	for x in range(columns):
 		for z in range(rows):
-			set_cell_item(Vector3i(x, 0, z), normal_item)
+			set_cell_item(Vector3i(x, 0, z), normal_items[0])
 	
 	update_grid_data()
 	initialize_astar()
@@ -108,7 +114,11 @@ func randomize_grid():
 	for x in range(columns):
 		for z in range(rows):
 			var random_value = rng.randi() % 100  # Generate a random number between 0 and 99
-			var item_index = normal_item if random_value < 80 else non_walkable_item  # 80% chance for normal, 20% for non-walkable
+			var item_index
+			if random_value < 80:
+				item_index = normal_items[rng.randi() % normal_items.size()]
+			else:
+				item_index = non_walkable_items[rng.randi() % non_walkable_items.size()]
 			set_cell_from_data(x, z, item_index)
 	
 	update_grid_data()
@@ -181,7 +191,6 @@ func update_grid_data():
 			row.append(get_cell_item(Vector3i(x, 0, z)))
 		grid_data.append(row)
 	emit_signal("grid_updated")
-
 
 func set_cell_from_data(x: int, z: int, item_index: int):
 	if x >= 0 and x < columns and z >= 0 and z < rows:
@@ -256,11 +265,11 @@ func clear_path_visualization():
 		for z in range(rows):
 			var cell_item = get_cell_item(Vector3i(x, 0, z))
 			if cell_item == hover_item or cell_item == start_item or cell_item == end_item:
-				set_cell_item(Vector3i(x, 0, z), normal_item)
+				set_cell_item(Vector3i(x, 0, z), normal_items[0])
 
 func get_cell_cost(x: int, z: int) -> float:
 	var cell_item = get_cell_item(Vector3i(x, 0, z))
-	if cell_item == non_walkable_item:
+	if cell_item in non_walkable_items:
 		return INF
 	elif cell_item == hover_item:
 		return 0.5
@@ -278,3 +287,12 @@ func update_astar_costs():
 			else:
 				astar.set_point_disabled(point_id, false)
 				astar.set_point_weight_scale(point_id, cost)
+
+func get_cell_rotation(position: Vector3i) -> int:
+	return get_cell_item_orientation(position)
+
+func set_cell_rotation(position: Vector3i, mode: int):
+	var item = get_cell_item(position)
+	if item != INVALID_CELL_ITEM:
+		var orientation = int(mode)
+		set_cell_item(position, item, orientation)

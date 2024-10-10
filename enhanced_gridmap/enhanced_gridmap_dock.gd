@@ -61,9 +61,9 @@ func connect_signals():
 func initialize_custom_item_states():
 	# Add default item states
 	add_custom_item_state("Normal", 0)
-	add_custom_item_state("Hover", 1)
-	add_custom_item_state("Start", 2)
-	add_custom_item_state("End", 3)
+	#add_custom_item_state("Hover", 1)
+	#add_custom_item_state("Start", 2)
+	#add_custom_item_state("End", 3)
 	add_custom_item_state("Non-Walkable", 4)
 
 func add_custom_item_state(name: String, id: int):
@@ -190,13 +190,12 @@ func _update_grid_ui():
 			var cell_container = VBoxContainer.new()
 			cell_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			cell_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
-			#cell_container.custom_minimum_size = Vector2(30, 30)
 			
 			var coord_label = Label.new()
 			coord_label.text = "(%d,%d)" % [x, z]
 			coord_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			coord_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-			coord_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+			coord_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			cell_container.add_child(coord_label)
 
 			var option = OptionButton.new()
@@ -209,6 +208,26 @@ func _update_grid_ui():
 			option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			option.size_flags_vertical = Control.SIZE_EXPAND_FILL
 			cell_container.add_child(option)
+
+			# Add rotation Option for each cell
+			var rotation_option = OptionButton.new()
+			rotation_option.add_item("0°", 0)
+			rotation_option.add_item("90°", 10)
+			rotation_option.add_item("180°", 16)
+			rotation_option.add_item("270°", 22)
+			rotation_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			rotation_option.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			rotation_option.set_meta("grid_position", Vector2i(x, z))
+			# Set the current item based on the cell's rotation
+			var current_rotation = enhanced_gridmap.get_cell_rotation(Vector3i(x, 0, z))
+			match current_rotation:
+				0: rotation_option.select(0)
+				10: rotation_option.select(1)
+				16: rotation_option.select(2)
+				22: rotation_option.select(3)
+			rotation_option.item_selected.connect(_on_cell_rotation_changed.bind(rotation_option))
+			
+			cell_container.add_child(rotation_option)
 			
 			row_container.add_child(cell_container)
 			cell_options.append(option)
@@ -321,3 +340,10 @@ func _on_non_walkable_item_changed(value):
 
 func _on_grid_updated():
 	update_ui()
+
+func _on_cell_rotation_changed(index: int, option: OptionButton):
+	var position = option.get_meta("grid_position")
+	var rotation_value = option.get_item_id(index)
+	if enhanced_gridmap:
+		enhanced_gridmap.set_cell_rotation(Vector3i(position.x, 0, position.y), rotation_value)
+		print("Cell rotation changed: ", rotation_value, " at position: ", position)
