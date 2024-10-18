@@ -1,48 +1,30 @@
-[gd_resource type="MeshLibrary" load_steps=9 format=3 uid="uid://54tpx8cmksfc"]
+[gd_resource type="MeshLibrary" load_steps=7 format=3 uid="uid://54tpx8cmksfc"]
 
-[ext_resource type="ArrayMesh" uid="uid://bc36i775x8wnl" path="res://assets/models/meshes/grass.res" id="1_if5c2"]
-[ext_resource type="ArrayMesh" uid="uid://dftagxajjtnn1" path="res://assets/models/meshes/grass_tree.res" id="2_a21xp"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pngyl"]
-transparency = 1
-albedo_color = Color(0, 0.5, 1, 0.490196)
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_111ba"]
-material = SubResource("StandardMaterial3D_pngyl")
-size = Vector2(1, 1)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ens68"]
-transparency = 1
-albedo_color = Color(0.996406, 0.318703, 0, 0.490196)
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_lhk14"]
-material = SubResource("StandardMaterial3D_ens68")
-size = Vector2(1, 1)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uxvcs"]
-transparency = 1
-albedo_color = Color(0, 0, 0, 0.490196)
-ao_enabled = true
+[ext_resource type="ArrayMesh" uid="uid://dqguomxd16u0i" path="res://assets/models/meshes/start.res" id="1_xdwel"]
+[ext_resource type="ArrayMesh" uid="uid://dspusnbkr74hg" path="res://assets/models/meshes/hover.res" id="2_5gp4i"]
+[ext_resource type="Material" uid="uid://bsyh0x4cy5qyr" path="res://assets/models/meshes/end.tres" id="3_qi66w"]
+[ext_resource type="ArrayMesh" uid="uid://d4himvyb81in8" path="res://assets/models/meshes/non-walkable.res" id="4_h83ju"]
+[ext_resource type="ArrayMesh" uid="uid://bgvropltcot0q" path="res://assets/models/meshes/normal.res" id="5_san4u"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ti6kf"]
-material = SubResource("StandardMaterial3D_uxvcs")
+material = ExtResource("3_qi66w")
 size = Vector2(1, 1)
 
 [resource]
 item/0/name = "normal"
-item/0/mesh = ExtResource("1_if5c2")
+item/0/mesh = ExtResource("1_xdwel")
 item/0/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/0/shapes = []
 item/0/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/0/navigation_layers = 1
 item/1/name = "hover"
-item/1/mesh = SubResource("PlaneMesh_111ba")
+item/1/mesh = ExtResource("2_5gp4i")
 item/1/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/1/shapes = []
 item/1/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/1/navigation_layers = 1
 item/2/name = "start"
-item/2/mesh = SubResource("PlaneMesh_lhk14")
+item/2/mesh = ExtResource("1_xdwel")
 item/2/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/2/shapes = []
 item/2/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
@@ -54,13 +36,13 @@ item/3/shapes = []
 item/3/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/3/navigation_layers = 1
 item/4/name = "non-walkable"
-item/4/mesh = ExtResource("2_a21xp")
+item/4/mesh = ExtResource("4_h83ju")
 item/4/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/4/shapes = []
 item/4/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/4/navigation_layers = 1
 item/6/name = "grass"
-item/6/mesh = ExtResource("1_if5c2")
+item/6/mesh = ExtResource("5_san4u")
 item/6/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/6/shapes = []
 item/6/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
