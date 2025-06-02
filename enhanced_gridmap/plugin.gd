@@ -5,7 +5,7 @@ var dock
 
 func _enter_tree():
 	dock = preload("res://addons/enhanced_gridmap/enhanced_gridmap_dock.tscn").instantiate()
-	add_control_to_dock(DOCK_SLOT_LEFT_UL, dock)
+	add_control_to_dock(DOCK_SLOT_RIGHT_UL, dock)
 	add_custom_type("EnhancedGridMap", "GridMap", preload("res://addons/enhanced_gridmap/enhanced_gridmap.gd"), preload("res://addons/enhanced_gridmap/icon.png"))
 
 func _exit_tree():
@@ -25,4 +25,5 @@ func _get_plugin_name():
 
 func _edit(object):
 	if dock and object is EnhancedGridMap:
-		dock.set_enhanced_gridmap(object)
+		if is_instance_valid(dock) and dock.has_method("set_enhanced_gridmap"):
+			dock.set_enhanced_gridmap(object)

@@ -1,11 +1,12 @@
 [gd_scene load_steps=2 format=3 uid="uid://bnkcae3aoavgh"]
 
-[ext_resource type="Script" path="res://addons/enhanced_gridmap/enhanced_gridmap_dock.gd" id="1_abcde"]
+[ext_resource type="Script" uid="uid://fmgdfwvicktv" path="res://addons/enhanced_gridmap/enhanced_gridmap_dock.gd" id="1_abcde"]
 
 [node name="Enhanced GridMap" type="ScrollContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_bottom = 137.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_abcde")
@@ -21,6 +22,17 @@ text = "☕︎ Enhanced Grid Map"
 
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
 layout_mode = 2
+
+[node name="FloorContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/FloorContainer"]
+layout_mode = 2
+text = "Floor:"
+
+[node name="FloorSpinBox" type="SpinBox" parent="VBoxContainer/FloorContainer"]
+layout_mode = 2
+max_value = 10.0
 
 [node name="Columns" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
@@ -46,16 +58,33 @@ layout_mode = 2
 min_value = 1.0
 value = 10.0
 
+[node name="FloorsCount" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/FloorsCount"]
+layout_mode = 2
+text = "Total Floors:"
+
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/FloorsCount"]
+layout_mode = 2
+min_value = 1.0
+value = 3.0
+
 [node name="AutoGenerate" type="CheckBox" parent="VBoxContainer"]
 layout_mode = 2
 text = "Auto Generate"
 
-[node name="ClearButton" type="Button" parent="VBoxContainer"]
+[node name="GridOperations" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
+
+[node name="ClearButton" type="Button" parent="VBoxContainer/GridOperations"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Clear Grid"
 
-[node name="GenerateButton" type="Button" parent="VBoxContainer"]
+[node name="GenerateButton" type="Button" parent="VBoxContainer/GridOperations"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Generate Grid"
 
 [node name="QuickFillLabel" type="Label" parent="VBoxContainer"]
@@ -235,3 +264,32 @@ text = "Find Path"
 layout_mode = 2
 text = "Path Result:"
 autowrap_mode = 2
+
+[node name="ItemManagement" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/ItemManagement"]
+layout_mode = 2
+text = "Item Management"
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer/ItemManagement"]
+layout_mode = 2
+
+[node name="SwapItems" type="HBoxContainer" parent="VBoxContainer/ItemManagement"]
+layout_mode = 2
+
+[node name="OldItem" type="SpinBox" parent="VBoxContainer/ItemManagement/SwapItems"]
+layout_mode = 2
+tooltip_text = "Old Item ID"
+
+[node name="Label" type="Label" parent="VBoxContainer/ItemManagement/SwapItems"]
+layout_mode = 2
+text = "->"
+
+[node name="NewItem" type="SpinBox" parent="VBoxContainer/ItemManagement/SwapItems"]
+layout_mode = 2
+tooltip_text = "New Item ID"
+
+[node name="SwapButton" type="Button" parent="VBoxContainer/ItemManagement/SwapItems"]
+layout_mode = 2
+text = "Swap Items"
