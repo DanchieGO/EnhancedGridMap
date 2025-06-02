@@ -1,18 +1,21 @@
-# EnhancedGridMap Plugin for Godot 4.3
+# EnhancedGridMap Plugin for Godot 4
 
 ## Overview
 
-EnhancedGridMap is a powerful plugin for Godot 4.3 that extends the functionality of the built-in GridMap node. It provides additional features for grid-based game development, including custom cell states, A* pathfinding, and an intuitive editor interface.
+EnhancedGridMap is a powerful plugin for Godot 4.3 that extends the functionality of the built-in GridMap node. It provides additional features for grid-based game development, including custom cell states, multi-floor support, and advanced grid manipulation tools.
 
 ## Features
 
 - Custom grid size (columns and rows)
+- Multi-floor support with floor management
 - Auto-generation of grid
 - Custom cell states with visual representation
 - A* pathfinding with diagonal movement option
 - Randomization of grid cells
 - Fill grid with specific cell types
+- Item swapping functionality
 - Editor dock for easy manipulation of grid properties
+- Floor-specific operations for generating, clearing, and filling grids
 
 ## Installation
 
@@ -27,7 +30,9 @@ The EnhancedGridMap Dock provides a user-friendly interface to control and manip
 
 1. **Columns**: Set the number of columns in the grid.
 2. **Rows**: Set the number of rows in the grid.
-3. **Auto Generate**: Toggle automatic grid generation when properties change.
+3. **Floors**: Set the number of floors in your grid.
+4. **Current Floor**: Select which floor to edit.
+5. **Auto Generate**: Toggle automatic grid generation when properties change.
 
 ### Grid Operations
 
@@ -35,6 +40,7 @@ The EnhancedGridMap Dock provides a user-friendly interface to control and manip
 2. **Clear**: Remove all cells from the grid.
 3. **Randomize**: Randomly assign cell types based on defined states.
 4. **Fill**: Fill the entire grid with a specific cell type.
+5. **Swap Items**: Replace all instances of one item type with another.
 
 ### Cell States
 
@@ -58,6 +64,27 @@ The dock allows you to define and manage custom cell states:
 3. **State Management**:
    - Edit existing states
    - Remove custom states
+   - Swap items between states
+
+### Floor Management
+
+The new floor management system allows you to:
+
+1. **Add/Remove Floors**: Dynamically adjust the number of floors in your grid.
+2. **Floor Navigation**: Easily switch between different floors for editing.
+3. **Floor-Specific Operations**:
+   - Generate specific floors
+   - Clear individual floors
+   - Fill selected floors with specific items
+
+### Item Swapping
+
+The new item swapping feature allows you to:
+
+1. **Select Source Item**: Choose the item type to be replaced.
+2. **Select Target Item**: Choose the new item type to replace with.
+3. **Swap Items**: Replace all instances of the source item with the target item.
+4. **Floor-Specific Swapping**: Option to swap items only on the current floor or across all floors.
 
 ### A* Pathfinding
 
@@ -91,6 +118,7 @@ Cell states are central to the EnhancedGridMap's functionality:
 2. **Custom states**: Create states for specific game mechanics (e.g., water, lava, ice).
 3. **State properties**:
    - ID: Used in scripts to set or check cell states.
+   - Name: Human-readable label
    - Randomize inclusion: Determine if the state should be included in randomization.
    - Randomize percentage: Control the frequency of the state when randomizing.
 
@@ -208,7 +236,8 @@ This setup allows for click-to-move functionality on your EnhancedGridMap, with 
 - `columns: int` - Number of columns in the grid
 - `rows: int` - Number of rows in the grid
 - `auto_generate: bool` - Whether to automatically generate the grid when properties change
-- `normal_item: int` - Item index for normal cells
+- `normal_items: Array[int]` - Array of item indices for normal cells (default: [0])
+- `non_walkable_items: Array[int]` - Array of item indices for non-walkable cells (default: [4])
 - `hover_item: int` - Item index for hover state cells
 - `start_item: int` - Item index for pathfinding start cells
 - `end_item: int` - Item index for pathfinding end cells
@@ -224,22 +253,41 @@ This setup allows for click-to-move functionality on your EnhancedGridMap, with 
 - `randomize_grid()` - Randomize cell types in the grid
 - `randomize_grid_custom(randomize_states: Array)` - Randomize cell types based on custom states
 - `fill_grid(item_index: int)` - Fill the entire grid with a specific item type
+- `validate_item_indices()` - Validate and ensure all item indices are within valid range
+
+#### Property Setters
+
+- `set_columns(value: int)` - Set the number of columns and update grid if auto-generate is enabled
+- `set_rows(value: int)` - Set the number of rows and update grid if auto-generate is enabled
+- `set_floors(value: int)` - Set the number of floors and update grid if auto-generate is enabled
+- `set_auto_generate(value: bool)` - Enable/disable auto-generation of grid on property changes
 
 #### Cell Manipulation
 
 - `set_cell_from_data(x: int, z: int, item_index: int)` - Set a specific cell's item type
 - `get_cell_cost(x: int, z: int) -> float` - Get the cost of moving through a specific cell
+- `update_grid_data()` - Update the internal grid data structure
+- `update_cell_visual(x: int, z: int)` - Update the visual representation of a specific cell
 
 #### Pathfinding
 
 - `find_path(start: Vector2, end: Vector2) -> Array` - Find a path between two points
 - `set_diagonal_movement(enable: bool)` - Enable or disable diagonal movement in pathfinding
 - `set_point_solid(x: int, z: int, is_solid: bool)` - Set whether a point is solid (non-walkable) for pathfinding
+- `initialize_astar()` - Initialize the A* pathfinding system
+- `update_astar_costs()` - Update pathfinding costs for all cells
 
 ### Signals
 
 - `mesh_library_changed` - Emitted when the MeshLibrary is changed
 - `grid_updated` - Emitted when the grid is updated
+
+### Internal Variables
+
+- `current_mesh_library: MeshLibrary` - Reference to the currently assigned MeshLibrary
+- `grid_data: Array` - 3D array storing grid data [floor][row][column]
+- `astar_by_floor: Dictionary` - Dictionary of AStar2D instances per floor
+- `path: Array` - Stores the last calculated pathfinding path
 
 ### Example Scene : Player Movement API
 
