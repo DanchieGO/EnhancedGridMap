@@ -1,8 +1,13 @@
+<<<<<<< HEAD
 [gd_resource type="MeshLibrary" load_steps=12 format=3 uid="uid://54tpx8cmksfc"]
+=======
+[gd_resource type="MeshLibrary" load_steps=7 format=3 uid="uid://54tpx8cmksfc"]
+>>>>>>> 4bf449536975898217e92ff51ce6cae076b81c6d
 
 [ext_resource type="ArrayMesh" uid="uid://dqguomxd16u0i" path="res://assets/models/meshes/start.res" id="1_xdwel"]
 [ext_resource type="ArrayMesh" uid="uid://dspusnbkr74hg" path="res://assets/models/meshes/hover.res" id="2_5gp4i"]
 [ext_resource type="Material" uid="uid://bsyh0x4cy5qyr" path="res://assets/models/meshes/end.tres" id="3_qi66w"]
+<<<<<<< HEAD
 [ext_resource type="ArrayMesh" uid="uid://dtr46jmckif0p" path="res://assets/models/meshes/block.res" id="4_8v5xv"]
 [ext_resource type="ArrayMesh" uid="uid://d4himvyb81in8" path="res://assets/models/meshes/non-walkable.res" id="4_h83ju"]
 [ext_resource type="ArrayMesh" uid="uid://bgvropltcot0q" path="res://assets/models/meshes/normal.res" id="5_san4u"]
@@ -10,6 +15,10 @@
 [ext_resource type="ArrayMesh" uid="uid://dr80txgr61irt" path="res://assets/models/tiles/tile_diamond.tres" id="8_rj3ss"]
 [ext_resource type="ArrayMesh" uid="uid://b5ta7tcw0iscd" path="res://assets/models/tiles/tile_coin.tres" id="9_44311"]
 [ext_resource type="ArrayMesh" uid="uid://cv4bedhida00g" path="res://assets/models/tiles/tile_star.tres" id="9_y8bbi"]
+=======
+[ext_resource type="ArrayMesh" uid="uid://d4himvyb81in8" path="res://assets/models/meshes/non-walkable.res" id="4_h83ju"]
+[ext_resource type="ArrayMesh" uid="uid://bgvropltcot0q" path="res://assets/models/meshes/normal.res" id="5_san4u"]
+>>>>>>> 4bf449536975898217e92ff51ce6cae076b81c6d
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ti6kf"]
 material = ExtResource("3_qi66w")
