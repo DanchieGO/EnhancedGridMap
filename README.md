@@ -1,4 +1,4 @@
-# EnhancedGridMap Plugin for Godot 4
+# EnhancedGridMap Plugin for Godot 4.4.1
 
 ## Overview
 
