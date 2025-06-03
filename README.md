@@ -1,8 +1,8 @@
-# EnhancedGridMap Plugin for Godot 4.4.1
+# EnhancedGridMap Plugin for Godot 4.4
 
 ## Overview
 
-EnhancedGridMap is a powerful plugin for Godot 4.3 that extends the functionality of the built-in GridMap node. It provides additional features for grid-based game development, including custom cell states, multi-floor support, and advanced grid manipulation tools.
+EnhancedGridMap is a powerful plugin for Godot 4.4 that extends the functionality of the built-in GridMap node. It provides additional features for grid-based game development, including custom cell states, multi-floor support, and advanced grid manipulation tools.
 
 ## Features
 
