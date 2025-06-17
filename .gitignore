@@ -25,3 +25,8 @@ mono_crash.*.json
 
 # Jetbrains IDE files
 .idea/
+
+# Ignore some of unecessary file
+project.godot
+*.import
+*.svg
