@@ -1,130 +1,58 @@
-<<<<<<< HEAD
-[gd_resource type="MeshLibrary" load_steps=12 format=3 uid="uid://54tpx8cmksfc"]
-=======
-[gd_resource type="MeshLibrary" load_steps=7 format=3 uid="uid://54tpx8cmksfc"]
->>>>>>> 4bf449536975898217e92ff51ce6cae076b81c6d
+[gd_resource type="MeshLibrary" load_steps=4 format=3 uid="uid://kcv6ans86ug7"]
 
-[ext_resource type="ArrayMesh" uid="uid://dqguomxd16u0i" path="res://assets/models/meshes/start.res" id="1_xdwel"]
-[ext_resource type="ArrayMesh" uid="uid://dspusnbkr74hg" path="res://assets/models/meshes/hover.res" id="2_5gp4i"]
-[ext_resource type="Material" uid="uid://bsyh0x4cy5qyr" path="res://assets/models/meshes/end.tres" id="3_qi66w"]
-<<<<<<< HEAD
-[ext_resource type="ArrayMesh" uid="uid://dtr46jmckif0p" path="res://assets/models/meshes/block.res" id="4_8v5xv"]
-[ext_resource type="ArrayMesh" uid="uid://d4himvyb81in8" path="res://assets/models/meshes/non-walkable.res" id="4_h83ju"]
-[ext_resource type="ArrayMesh" uid="uid://bgvropltcot0q" path="res://assets/models/meshes/normal.res" id="5_san4u"]
-[ext_resource type="ArrayMesh" uid="uid://36tgon3b60db" path="res://assets/models/tiles/tile_heart.tres" id="6_r6sve"]
-[ext_resource type="ArrayMesh" uid="uid://dr80txgr61irt" path="res://assets/models/tiles/tile_diamond.tres" id="8_rj3ss"]
-[ext_resource type="ArrayMesh" uid="uid://b5ta7tcw0iscd" path="res://assets/models/tiles/tile_coin.tres" id="9_44311"]
-[ext_resource type="ArrayMesh" uid="uid://cv4bedhida00g" path="res://assets/models/tiles/tile_star.tres" id="9_y8bbi"]
-=======
-[ext_resource type="ArrayMesh" uid="uid://d4himvyb81in8" path="res://assets/models/meshes/non-walkable.res" id="4_h83ju"]
-[ext_resource type="ArrayMesh" uid="uid://bgvropltcot0q" path="res://assets/models/meshes/normal.res" id="5_san4u"]
->>>>>>> 4bf449536975898217e92ff51ce6cae076b81c6d
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_ti6kf"]
-material = ExtResource("3_qi66w")
-size = Vector2(1, 1)
+[ext_resource type="BoxMesh" uid="uid://bb3b32qso3yab" path="res://addons/enhanced_gridmap/meshlibrary/tile_normal.tres" id="1_tuv3s"]
+[ext_resource type="BoxMesh" uid="uid://c1wa5rjlu0fuo" path="res://addons/enhanced_gridmap/meshlibrary/tile_hover.tres" id="2_p3ap8"]
+[ext_resource type="BoxMesh" uid="uid://dcjdwbffgtutt" path="res://addons/enhanced_gridmap/meshlibrary/tile_end.tres" id="3_p3ap8"]
 
 [resource]
 item/0/name = "normal"
-item/0/mesh = ExtResource("1_xdwel")
+item/0/mesh = ExtResource("1_tuv3s")
 item/0/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/0/mesh_cast_shadow = 1
 item/0/shapes = []
 item/0/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/0/navigation_layers = 1
 item/1/name = "hover"
-item/1/mesh = ExtResource("2_5gp4i")
+item/1/mesh = ExtResource("2_p3ap8")
 item/1/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/1/mesh_cast_shadow = 1
 item/1/shapes = []
 item/1/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/1/navigation_layers = 1
 item/2/name = "start"
-item/2/mesh = ExtResource("1_xdwel")
 item/2/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/2/mesh_cast_shadow = 1
 item/2/shapes = []
 item/2/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/2/navigation_layers = 1
 item/3/name = "end"
-item/3/mesh = SubResource("PlaneMesh_ti6kf")
+item/3/mesh = ExtResource("3_p3ap8")
 item/3/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/3/mesh_cast_shadow = 1
 item/3/shapes = []
 item/3/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/3/navigation_layers = 1
 item/4/name = "non-walkable"
-item/4/mesh = ExtResource("4_h83ju")
 item/4/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/4/mesh_cast_shadow = 1
 item/4/shapes = []
 item/4/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/4/navigation_layers = 1
-item/6/name = "grass"
-item/6/mesh = ExtResource("5_san4u")
+item/5/name = "disable"
+item/5/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/5/mesh_cast_shadow = 1
+item/5/shapes = []
+item/5/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/5/navigation_layers = 1
+item/6/name = "6"
 item/6/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/6/mesh_cast_shadow = 1
 item/6/shapes = []
 item/6/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/6/navigation_layers = 1
-item/7/name = "tile_heart"
-item/7/mesh = ExtResource("6_r6sve")
-item/7/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.9, 0)
+item/7/name = "7"
+item/7/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/7/mesh_cast_shadow = 1
 item/7/shapes = []
 item/7/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/7/navigation_layers = 1
-item/8/name = "tile_diamond"
-item/8/mesh = ExtResource("8_rj3ss")
-item/8/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.9, 0)
-item/8/mesh_cast_shadow = 1
-item/8/shapes = []
-item/8/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-item/8/navigation_layers = 1
-item/9/name = "tile_star"
-item/9/mesh = ExtResource("9_y8bbi")
-item/9/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.9, 0)
-item/9/mesh_cast_shadow = 1
-item/9/shapes = []
-item/9/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-item/9/navigation_layers = 1
-item/10/name = "tile_coin"
-item/10/mesh = ExtResource("9_44311")
-item/10/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.9, 0)
-item/10/mesh_cast_shadow = 1
-item/10/shapes = []
-item/10/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-item/10/navigation_layers = 1
-item/11/name = "obstacle_block"
-item/11/mesh = ExtResource("4_8v5xv")
-item/11/mesh_transform = Transform3D(1.65, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, 0.5)
-item/11/mesh_cast_shadow = 1
-item/11/shapes = []
-item/11/navigation_mesh_transform = Transform3D(0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0)
-item/11/navigation_layers = 1
-item/12/name = "obstacle_block_h"
-item/12/mesh = ExtResource("4_8v5xv")
-item/12/mesh_transform = Transform3D(1.65, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0.5)
-item/12/mesh_cast_shadow = 1
-item/12/shapes = []
-item/12/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-item/12/navigation_layers = 1
-item/13/name = "obstacle_block_v"
-item/13/mesh = ExtResource("4_8v5xv")
-item/13/mesh_transform = Transform3D(1.65, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, 0.5)
-item/13/mesh_cast_shadow = 1
-item/13/shapes = []
-item/13/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-item/13/navigation_layers = 1
-item/14/name = ""
-item/14/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-item/14/mesh_cast_shadow = 1
-item/14/shapes = []
-item/14/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-item/14/navigation_layers = 1
-item/15/name = ""
-item/15/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-item/15/mesh_cast_shadow = 1
-item/15/shapes = []
-item/15/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-item/15/navigation_layers = 1

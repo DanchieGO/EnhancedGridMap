@@ -1,0 +1,7 @@
+[gd_resource type="BoxMesh" load_steps=2 format=3 uid="uid://dy5p77cjb3geo"]
+
+[ext_resource type="Material" uid="uid://cn1pvqd4gf1u7" path="res://addons/enhanced_gridmap/meshlibrary/mat_hover.tres" id="1_nrdsg"]
+
+[resource]
+material = ExtResource("1_nrdsg")
+size = Vector3(1.9, 0.5, 1.9)
