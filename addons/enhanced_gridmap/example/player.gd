@@ -12,11 +12,6 @@ var is_player_moving: bool = false
 @export var cell_size: Vector3 = Vector3(2, 2, 2)
 @export var cell_offset: Vector3 = Vector3(0, 0, 0)
 
-# Center offset flags
-@export var center_x: bool = false
-@export var center_y: bool = false
-@export var center_z: bool = false
-
 # Diagonal movement flag
 @export var use_diagonal_movement: bool = false:
 	set(value):
@@ -129,14 +124,6 @@ func grid_to_world(grid_position: Vector2i) -> Vector3:
 	
 	# Center the player within the cell
 	world_position.x += cell_size.x * 0.5
-	world_position.z += cell_size.z * 0.5
-	
-	# Apply additional center offsets if needed
-	if center_x:
-		world_position.x += cell_size.x * 0.5
-	if center_y:
-		world_position.y += cell_size.y * 0.5
-	if center_z:
-		world_position.z += cell_size.z * 0.5
+	world_position.z += cell_size.z * 0.5 
 	
 	return world_position + cell_offset
