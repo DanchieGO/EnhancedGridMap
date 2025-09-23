@@ -1,0 +1,7 @@
+[gd_resource type="BoxMesh" load_steps=2 format=3 uid="uid://bme80knq1bjye"]
+
+[ext_resource type="Material" uid="uid://cno0w4v7anuvd" path="res://addons/enhanced_gridmap/meshlibrary/mat_obstacle.tres" id="1_mk6xr"]
+
+[resource]
+material = ExtResource("1_mk6xr")
+size = Vector3(1.9, 1, 5.9)

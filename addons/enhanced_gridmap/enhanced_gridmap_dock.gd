@@ -38,9 +38,13 @@ var enhanced_gridmap: EnhancedGridMap
 @onready var new_item_spin = $VBoxContainer/ItemManagement/SwapItems/NewItem
 @onready var swap_button = $VBoxContainer/ItemManagement/SwapItems/SwapButton
 
+# Multi-Cell UI elements
+@onready var multi_cell_container = $VBoxContainer/MultiCellContainer/VBoxContainer
+
 var row_containers: Array = []
 var cell_options: Array = []
 var custom_item_states: Dictionary = {}
+var multi_cell_definitions: Dictionary = {} # {item_id: Vector2i_size}
 
 func _ready():
 	connect_signals()
@@ -66,15 +70,12 @@ func connect_signals():
 	end_item_spin.value_changed.connect(_on_end_item_changed)
 	non_walkable_item_spin.value_changed.connect(_on_non_walkable_item_changed)
 	swap_button.pressed.connect(_on_swap_items_pressed)
+	$VBoxContainer/MultiCellContainer/AddDefinitionButton.pressed.connect(_on_add_multi_cell_definition_pressed)
 
 func initialize_custom_item_states():
-	# Add default item states
-	#add_custom_item_state("Normal", 0)
-	#add_custom_item_state("Non-Walkable", 4)
 	pass
 
 func add_custom_item_state(name: String, id: int):
-	# Check if an item state with this ID already exists
 	if custom_item_states.has(id):
 		print("Item state with ID ", id, " already exists")
 		return
@@ -83,66 +84,22 @@ func add_custom_item_state(name: String, id: int):
 	custom_item_states[id] = new_state
 	add_item_state_ui(new_state)
 
-#func add_item_state_ui(item_state: CustomItemState):
-	#var container = HBoxContainer.new()
-	#var name_edit = LineEdit.new()
-	#var id_spin = SpinBox.new()
-	#var randomize_check = CheckBox.new()
-	#var percentage_spin = SpinBox.new()
-	#var remove_button = Button.new()
-#
-	#name_edit.text = item_state.name
-	#name_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	#name_edit.text_changed.connect(_on_item_state_name_changed.bind(item_state))
-#
-	#id_spin.value = item_state.id
-	#id_spin.min_value = 0
-	#id_spin.max_value = 9999
-	#id_spin.value_changed.connect(_on_item_state_id_changed.bind(item_state))
-#
-	#randomize_check.text = "🎲"
-	#randomize_check.button_pressed = item_state.include_in_randomize
-	#randomize_check.toggled.connect(_on_item_state_randomize_toggled.bind(item_state))
-#
-	#percentage_spin.min_value = 0
-	#percentage_spin.max_value = 100
-	#percentage_spin.value = item_state.randomize_percentage
-	#percentage_spin.suffix = "%"
-	#percentage_spin.value_changed.connect(_on_item_state_percentage_changed.bind(item_state))
-#
-	#remove_button.text = "Del"
-	#remove_button.pressed.connect(_on_remove_item_state_pressed.bind(item_state, container))
-#
-	#container.add_child(name_edit)
-	#container.add_child(id_spin)
-	#container.add_child(randomize_check)
-	#container.add_child(percentage_spin)
-	#container.add_child(remove_button)
-#
-	#item_states_container.add_child(container)
-
 func add_item_state_ui(item_state: CustomItemState):
 	var container = HBoxContainer.new()
 	
-	# Create a new OptionButton instead of separate name_edit and id_spin
 	var item_selector = OptionButton.new()
 	item_selector.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	
-	# Populate the selector with items from mesh_library
 	if enhanced_gridmap and enhanced_gridmap.mesh_library:
 		var item_list = enhanced_gridmap.mesh_library.get_item_list()
-		# Add an "Empty" option as item -1
 		item_selector.add_item("Empty", -1)
 		
-		# Add all items from the mesh library
 		for item_id in item_list:
 			var item_name = enhanced_gridmap.mesh_library.get_item_name(item_id)
 			item_selector.add_item(item_name, item_id)
-			# Select the current item if it matches
 			if item_id == item_state.id:
 				item_selector.select(item_selector.get_item_count() - 1)
 	
-	# Connect the item selection signal
 	item_selector.item_selected.connect(
 		func(index):
 			var selected_id = item_selector.get_item_id(index)
@@ -167,7 +124,6 @@ func add_item_state_ui(item_state: CustomItemState):
 	remove_button.text = "Del"
 	remove_button.pressed.connect(_on_remove_item_state_pressed.bind(item_state, container))
 	
-	# Add all components to the container
 	container.add_child(item_selector)
 	container.add_child(randomize_check)
 	container.add_child(percentage_spin)
@@ -175,16 +131,12 @@ func add_item_state_ui(item_state: CustomItemState):
 	
 	item_states_container.add_child(container)
 
-# Add a new function to handle item selection changes
 func _on_item_state_selection_changed(new_id: int, new_name: String, item_state: CustomItemState):
-	# Remove the item state from the dictionary with the old ID
 	custom_item_states.erase(item_state.id)
 	
-	# Update the item state
 	item_state.id = new_id
 	item_state.name = new_name
 	
-	# Add the item state back to the dictionary with the new ID
 	custom_item_states[new_id] = item_state
 
 func _on_add_item_state_pressed():
@@ -220,7 +172,6 @@ class CustomItemState:
 		id = _id
 
 func set_enhanced_gridmap(gridmap: EnhancedGridMap):
-	# Disconnect from previous gridmap if it exists
 	if enhanced_gridmap:
 		if enhanced_gridmap.grid_updated.is_connected(_on_grid_updated):
 			enhanced_gridmap.grid_updated.disconnect(_on_grid_updated)
@@ -231,7 +182,7 @@ func set_enhanced_gridmap(gridmap: EnhancedGridMap):
 		floor_spin.max_value = enhanced_gridmap.floors - 1
 		floors_count_spin.value = enhanced_gridmap.floors
 		update_ui()
-		_update_fill_options()  # Update the fill options when setting a new gridmap
+		_update_fill_options()
 		diagonal_movement_check.button_pressed = enhanced_gridmap.diagonal_movement
 		print("EnhancedGridMap set: ", enhanced_gridmap)
 
@@ -251,8 +202,6 @@ func _update_fill_options():
 		var item_list = enhanced_gridmap.mesh_library.get_item_list()
 		for i in range(item_list.size()):
 			fill_options.add_item(enhanced_gridmap.mesh_library.get_item_name(item_list[i]), i)
-
-# In enhanced_gridmap_dock.gd, update the _update_grid_ui function:
 
 func _update_grid_ui():
 	for child in grid_container.get_children():
@@ -287,18 +236,34 @@ func _update_grid_ui():
 
 			var option = OptionButton.new()
 			option.set_meta("grid_position", Vector3i(x, current_floor, z))
-			# Add empty option at index 0
 			option.add_item("Empty", -1)
-			# Add items from the mesh library
+			
 			for i in range(item_list.size()):
-				option.add_item(enhanced_gridmap.mesh_library.get_item_name(item_list[i]), i)
+				var item_id = item_list[i]
+				option.add_item(enhanced_gridmap.mesh_library.get_item_name(item_id), item_id)
 
-			# Ensure the selected item in the OptionButton corresponds to the current cell item
 			var cell_item = enhanced_gridmap.get_cell_item(Vector3i(x, current_floor, z))
-			if cell_item != -1 and cell_item < option.get_item_count():
-				option.select(cell_item)
+			
+			# Safely check multi-cell properties
+			var multi_cell_data = enhanced_gridmap.get("multi_cell_objects")
+			var multi_cell_occupied_const = enhanced_gridmap.get("MULTI_CELL_OCCUPIED")
+
+			if cell_item == multi_cell_occupied_const:
+				option.disabled = true
+				option.clear()
+				option.add_item("Occupied")
+			elif multi_cell_data is Dictionary and multi_cell_data.has(Vector3i(x, current_floor, z)):
+				# This is a root cell, select its item
+				var item_index = option.get_item_index(cell_item)
+				if item_index != -1:
+					option.select(item_index)
 			else:
-				option.select(0) # Select the first item if the cell is empty
+				# Original logic for normal and empty cells
+				var item_index = option.get_item_index(cell_item)
+				if item_index != -1:
+					option.select(item_index)
+				else:
+					option.select(0)
 
 			option.item_selected.connect(_on_cell_item_selected.bind(option))
 			option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -379,7 +344,6 @@ func _on_randomize_pressed():
 		var randomize_states = []
 		var total_percentage = 0
 		
-		# Collect only enabled randomize states
 		for state in custom_item_states.values():
 			if state.include_in_randomize:
 				randomize_states.append(state)
@@ -403,21 +367,28 @@ func _on_fill_pressed():
 		else:
 			print("No item selected for filling")
 
-# func _on_cell_item_selected(index: int, option: OptionButton):
-# 	var position = option.get_meta("grid_position")
-# 	if enhanced_gridmap:
-# 		if index >= 0 and index < enhanced_gridmap.mesh_library.get_item_list().size():
-# 			enhanced_gridmap.set_cell_item(position, index)
-
 func _on_cell_item_selected(index: int, option: OptionButton):
 	var position = option.get_meta("grid_position")
-	if enhanced_gridmap:
-		var item_id = option.get_item_id(index)
-		if item_id == -1:
-			# Handle empty selection
-			enhanced_gridmap.set_cell_item(position, -1)
-		elif index > 0:  # Skip the first item (Empty)
-			enhanced_gridmap.set_cell_item(position, item_id)
+	if not enhanced_gridmap:
+		return
+		
+	var item_id = option.get_item_id(index)
+	var rotation = 0 # Default rotation
+	
+	# Find the corresponding rotation OptionButton
+	var cell_container = option.get_parent()
+	for child in cell_container.get_children():
+		if child is OptionButton and child != option:
+			rotation = child.get_item_id(child.selected)
+			break
+
+	# Check if this is a multi-cell item
+	if multi_cell_definitions.has(item_id):
+		var size = multi_cell_definitions[item_id]
+		enhanced_gridmap.set_multi_cell_item(position, item_id, size, rotation)
+	else: # Handle as a normal 1x1 item
+		enhanced_gridmap.set_cell_item(position, item_id, rotation)
+
 
 func _on_find_path_pressed():
 	if enhanced_gridmap:
@@ -462,11 +433,72 @@ func _on_cell_rotation_changed(index: int, option: OptionButton):
 	var position = option.get_meta("grid_position")
 	var rotation_value = option.get_item_id(index)
 	if enhanced_gridmap:
-		if index >= 0 and index < 4:
-			enhanced_gridmap.set_cell_rotation(position, rotation_value)
+		enhanced_gridmap.set_cell_rotation(position, rotation_value)
 
 func _on_swap_items_pressed():
 	if enhanced_gridmap:
 		var old_item = old_item_spin.value as int
 		var new_item = new_item_spin.value as int
 		enhanced_gridmap.swap_items(old_item, new_item, floor_spin.value as int)
+
+func _on_add_multi_cell_definition_pressed():
+	var h_box = HBoxContainer.new()
+	h_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+	var item_selector = OptionButton.new()
+	item_selector.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	item_selector.add_item("Select Item", -1)
+	
+	if enhanced_gridmap and enhanced_gridmap.mesh_library:
+		var item_list = enhanced_gridmap.mesh_library.get_item_list()
+		for item_id in item_list:
+			var item_name = enhanced_gridmap.mesh_library.get_item_name(item_id)
+			item_selector.add_item(item_name, item_id)
+
+	var size_x_spin = SpinBox.new()
+	size_x_spin.min_value = 1
+	size_x_spin.value = 1
+	size_x_spin.prefix = "W: "
+	
+	var size_z_spin = SpinBox.new()
+	size_z_spin.min_value = 1
+	size_z_spin.value = 1
+	size_z_spin.prefix = "H: "
+
+	var remove_button = Button.new()
+	remove_button.text = "X"
+
+	h_box.add_child(item_selector)
+	h_box.add_child(size_x_spin)
+	h_box.add_child(size_z_spin)
+	h_box.add_child(remove_button)
+	
+	multi_cell_container.add_child(h_box)
+	
+	var update_lambda = func(value = 0): # Default value for signals that pass arguments
+		var selected_index = item_selector.selected
+		if selected_index == -1: return
+		var selected_id = item_selector.get_item_id(selected_index)
+		var size = Vector2i(size_x_spin.value, size_z_spin.value)
+		
+		# Remove old definition if item changes
+		for key in multi_cell_definitions:
+			if multi_cell_definitions[key] == h_box.get_meta("size_data", Vector2i()):
+				multi_cell_definitions.erase(key)
+				break
+				
+		multi_cell_definitions[selected_id] = size
+		h_box.set_meta("size_data", size)
+
+
+	item_selector.item_selected.connect(update_lambda)
+	size_x_spin.value_changed.connect(update_lambda)
+	size_z_spin.value_changed.connect(update_lambda)
+	remove_button.pressed.connect(func():
+		var selected_index = item_selector.selected
+		if selected_index != -1:
+			var selected_id = item_selector.get_item_id(selected_index)
+			if multi_cell_definitions.has(selected_id):
+				multi_cell_definitions.erase(selected_id)
+		h_box.queue_free()
+	)

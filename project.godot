@@ -11,7 +11,8 @@ config_version=5
 [application]
 
 config/name="EnhancedGridMap"
-config/features=PackedStringArray("4.4", "GL Compatibility")
+run/main_scene="uid://dpihcqibm8d4q"
+config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [editor_plugins]
