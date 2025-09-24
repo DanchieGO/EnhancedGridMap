@@ -35,7 +35,7 @@ func _ready():
 
 	# Position the player at a valid starting position
 	#current_position = find_valid_starting_position()
-	current_position = Vector2i(0,2)
+	current_position = Vector2i(2,2)
 	update_player_position(current_position)
 
 func find_valid_starting_position() -> Vector2i:
@@ -44,7 +44,7 @@ func find_valid_starting_position() -> Vector2i:
 			for item in enhanced_gridmap.non_walkable_items.size():
 				if enhanced_gridmap.get_cell_item(Vector3i(x, 0, z)) != enhanced_gridmap.non_walkable_items[item]:
 					return Vector2i(x, z)
-	return Vector2i(0, 0)  # Fallback to (0,0) if no valid position found
+	return Vector2i(2, 2)  # Fallback to (0,0) if no valid position found
 
 func _unhandled_input(event):
 	
@@ -85,7 +85,10 @@ func move_player_to_clicked_position(grid_position: Vector2i):
 			print("Cannot move to non-walkable cell")
 			return
 	
-	var path = enhanced_gridmap.find_path(Vector2(current_position), Vector2(grid_position))
+	var path = enhanced_gridmap.find_path_normal(
+				Vector2(current_position),
+				Vector2(grid_position),
+				0)  
 	
 	if path.size() > 1:
 		path.pop_front()

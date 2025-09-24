@@ -1,8 +1,10 @@
-[gd_resource type="MeshLibrary" load_steps=4 format=3 uid="uid://kcv6ans86ug7"]
+[gd_resource type="MeshLibrary" load_steps=6 format=3 uid="uid://kcv6ans86ug7"]
 
 [ext_resource type="BoxMesh" uid="uid://bb3b32qso3yab" path="res://addons/enhanced_gridmap/meshlibrary/tile_normal.tres" id="1_tuv3s"]
 [ext_resource type="BoxMesh" uid="uid://c1wa5rjlu0fuo" path="res://addons/enhanced_gridmap/meshlibrary/tile_hover.tres" id="2_p3ap8"]
 [ext_resource type="BoxMesh" uid="uid://dcjdwbffgtutt" path="res://addons/enhanced_gridmap/meshlibrary/tile_end.tres" id="3_p3ap8"]
+[ext_resource type="BoxMesh" uid="uid://bn01pnvrbliba" path="res://addons/enhanced_gridmap/meshlibrary/tile_3x3.tres" id="4_76xkl"]
+[ext_resource type="BoxMesh" uid="uid://deox2oe342uh1" path="res://addons/enhanced_gridmap/meshlibrary/tile_1x3.tres" id="5_2ekt5"]
 
 [resource]
 item/0/name = "normal"
@@ -44,13 +46,15 @@ item/5/mesh_cast_shadow = 1
 item/5/shapes = []
 item/5/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/5/navigation_layers = 1
-item/6/name = "6"
+item/6/name = "3x3"
+item/6/mesh = ExtResource("4_76xkl")
 item/6/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/6/mesh_cast_shadow = 1
 item/6/shapes = []
 item/6/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/6/navigation_layers = 1
-item/7/name = "7"
+item/7/name = "1x3"
+item/7/mesh = ExtResource("5_2ekt5")
 item/7/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 item/7/mesh_cast_shadow = 1
 item/7/shapes = []
