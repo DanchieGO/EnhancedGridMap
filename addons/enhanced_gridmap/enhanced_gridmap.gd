@@ -16,6 +16,7 @@ signal grid_updated
 @export var start_item: int = 2
 @export var end_item: int = 3
 
+
 var current_mesh_library: MeshLibrary
 var grid_data: Array = [] # 3D array [floor][row][column]
 
@@ -418,64 +419,69 @@ func is_cell_walkable(pos: Vector2i, floor_index: int) -> bool:
 	var cell_item = get_cell_item(Vector3i(pos.x, floor_index, pos.y))
 	return cell_item != -1 and not (cell_item in non_walkable_items)
 
-# Improved A* pathfinding
-func initialize_astar():
-	astar_by_floor.clear()
-	for y in range(floors):
-		var astar = AStar2D.new()
-		
-		# Add all points
-		for x in range(columns):
-			for z in range(rows):
-				var point_id = z * columns + x
-				astar.add_point(point_id, Vector2(x, z))
-		
-		# Connect points based on neighbors
-		for x in range(columns):
-			for z in range(rows):
-				var current_pos = Vector2i(x, z)
-				var current_point_id = z * columns + x
-				
-				if not is_cell_walkable(current_pos, y):
-					continue
-				
-				var neighbors = get_neighbors(current_pos, y)
-				
-				## inside initialize_astar(), inner loop:
-				#for neighbor in neighbors:          # neighbours now contains 8 directions
-					#if neighbor.is_walkable:
-						#var neighbor_id = neighbor.position.y * columns + neighbor.position.x
-						## ALWAYS rebuild the edge (cardinal or diagonal)
-						#astar.disconnect_points(current_point_id, neighbor_id)
-						#var weight = 1.0 if not is_diagonal_direction(neighbor.direction) else 1.4142
-						#astar.connect_points(current_point_id, neighbor_id, true)
-						#astar.set_point_weight_scale(neighbor_id, weight)
-				
-				for neighbor in neighbors:
-					if neighbor.is_walkable:
-						var neighbor_id = neighbor.position.y * columns + neighbor.position.x
-
-						astar.disconnect_points(current_point_id, neighbor_id)
-						var weight = 1.0
-						if neighbor.is_long_jump: weight = 2.0   # one extra cell = double cost
-						astar.connect_points(current_point_id, neighbor_id, true)
-						astar.set_point_weight_scale(neighbor_id, weight)
-				
+## Improved A* pathfinding
+#func initialize_astar():
+	#astar_by_floor.clear()
+	#for y in range(floors):
+		#var astar = AStar2D.new()
+		#
+		## Add all points
+		#for x in range(columns):
+			#for z in range(rows):
+				#var point_id = z * columns + x
+				#astar.add_point(point_id, Vector2(x, z))
+		#
+		## Connect points based on neighbors
+		#for x in range(columns):
+			#for z in range(rows):
+				#var current_pos = Vector2i(x, z)
+				#var current_point_id = z * columns + x
+				#
+				#if not is_cell_walkable(current_pos, y):
+					#continue
+				#
+				#var neighbors = get_neighbors(current_pos, y)
+				#
+				### inside initialize_astar(), inner loop:
+				##for neighbor in neighbors:          # neighbours now contains 8 directions
+					##if neighbor.is_walkable:
+						##var neighbor_id = neighbor.position.y * columns + neighbor.position.x
+						### ALWAYS rebuild the edge (cardinal or diagonal)
+						##astar.disconnect_points(current_point_id, neighbor_id)
+						##var weight = 1.0 if not is_diagonal_direction(neighbor.direction) else 1.4142
+						##astar.connect_points(current_point_id, neighbor_id, true)
+						##astar.set_point_weight_scale(neighbor_id, weight)
+				#
 				#for neighbor in neighbors:
 					#if neighbor.is_walkable:
 						#var neighbor_id = neighbor.position.y * columns + neighbor.position.x
-						#
-						#if not astar.are_points_connected(current_point_id, neighbor_id):
-							#var weight = 1.0 if not is_diagonal_direction(neighbor.direction) else 1.4142
-							#
-							## Check if movement is allowed by obstacles
-							#if not is_blocked_by_obstacle(current_pos, neighbor.position, 3):
-								#astar.connect_points(current_point_id, neighbor_id, true)
-								#astar.set_point_weight_scale(neighbor_id, weight)
-		
-		astar_by_floor[y] = astar
-	
-	update_astar_costs()
+#
+						#astar.disconnect_points(current_point_id, neighbor_id)
+						#var weight = 1.0
+						#if neighbor.is_long_jump: weight = 2.0   # one extra cell = double cost
+						#astar.connect_points(current_point_id, neighbor_id, true)
+						#astar.set_point_weight_scale(neighbor_id, weight)
+				#
+				##for neighbor in neighbors:
+					##if neighbor.is_walkable:
+						##var neighbor_id = neighbor.position.y * columns + neighbor.position.x
+						##
+						##if not astar.are_points_connected(current_point_id, neighbor_id):
+							##var weight = 1.0 if not is_diagonal_direction(neighbor.direction) else 1.4142
+							##
+							### Check if movement is allowed by obstacles
+							##if not is_blocked_by_obstacle(current_pos, neighbor.position, 3):
+								##astar.connect_points(current_point_id, neighbor_id, true)
+								##astar.set_point_weight_scale(neighbor_id, weight)
+		#
+		#astar_by_floor[y] = astar
+	#initialize_astar_with_3x3()
+	#update_astar_costs()
+
+
+func initialize_astar():
+	initialize_astar_with_3x3()
+
 
 func find_path(start: Vector2, end: Vector2, floor_index: int = 0, clear_path_visual: bool = true) -> Array:
 	var astar = astar_by_floor.get(floor_index)
@@ -669,6 +675,157 @@ func get_3x3_centre(pos: Vector2, floor: int) -> Vector2:
 				return Vector2(n)
 	printerr("no walkable centre in 3×3 around ", pos)
 	return pos
+
+
+# Check if a position is the center of a 3x3 blue cell area
+func is_3x3_center(pos: Vector2i, floor: int = 0) -> bool:
+	# Check if this cell and all 8 surrounding cells are blue (item 1)
+	for dx in [-1, 0, 1]:
+		for dy in [-1, 0, 1]:
+			var check_pos = Vector2i(pos.x + dx, pos.y + dy)
+			if not is_position_valid(check_pos):
+				return false
+			var cell_item = get_cell_item(Vector3i(check_pos.x, floor, check_pos.y))
+			if cell_item != 1:  # Assuming 1 is the blue cell item
+				return false
+	return true
+
+# Find the center of a 3x3 blue area that contains the given position
+func find_3x3_center(pos: Vector2i, floor: int = 0) -> Vector2i:
+	# Check all possible center positions within range
+	for dx in [-1, 0, 1]:
+		for dy in [-1, 0, 1]:
+			var potential_center = Vector2i(pos.x + dx, pos.y + dy)
+			if is_position_valid(potential_center) and is_3x3_center(potential_center, floor):
+				return potential_center
+	return Vector2i(-1, -1)  # No center found
+
+# Check if a position is inside any 3x3 blue area
+func is_inside_3x3_blue_area(pos: Vector2i, floor: int = 0) -> bool:
+	return find_3x3_center(pos, floor) != Vector2i(-1, -1)
+
+# Enhanced pathfinding that can jump into 3x3 areas
+func find_path_with_3x3_jump(start: Vector2, end: Vector2, floor: int = 0) -> Array:
+	var start_pos = Vector2i(start)
+	var end_pos = Vector2i(end)
+	
+	# Check if the end position is inside a 3x3 blue area
+	var end_center = find_3x3_center(end_pos, floor)
+	if end_center != Vector2i(-1, -1):
+		# End is in a 3x3 area, path to the center instead
+		print("Target is in 3x3 area, pathfinding to center: ", end_center)
+		var path_to_center = find_path(start, Vector2(end_center), floor, false)
+		
+		if not path_to_center.is_empty():
+			# Add the original end position for smooth movement
+			path_to_center.append(end)
+			return path_to_center
+	
+	# Check if start position is inside a 3x3 blue area
+	var start_center = find_3x3_center(start_pos, floor)
+	if start_center != Vector2i(-1, -1):
+		# Start is in a 3x3 area, begin from the center
+		print("Start is in 3x3 area, pathfinding from center: ", start_center)
+		var path_from_center = find_path(Vector2(start_center), end, floor, false)
+		
+		if not path_from_center.is_empty():
+			# Insert the original start position at the beginning
+			path_from_center.insert(0, start)
+			return path_from_center
+	
+	# Neither start nor end is in 3x3 area, use regular pathfinding
+	return find_path(start, end, floor, false)
+
+# Modified neighbor detection to handle 3x3 jumping
+func get_neighbors_with_3x3_jump(current_pos: Vector2i, floor_index: int) -> Array[NeighborInfo]:
+	var neighbors: Array[NeighborInfo] = []
+	
+	# First, add regular neighbors
+	neighbors.append_array(get_neighbors(current_pos, floor_index))
+	
+	# Then check for 3x3 jump opportunities
+	var directions = {
+		Direction.NORTH: Vector2i(0, -1),
+		Direction.EAST: Vector2i(1, 0),
+		Direction.SOUTH: Vector2i(0, 1),
+		Direction.WEST: Vector2i(-1, 0)
+	}
+	
+	# Add diagonal directions if enabled
+	if diagonal_movement:
+		directions[Direction.NORTHWEST] = Vector2i(-1, -1)
+		directions[Direction.NORTHEAST] = Vector2i(1, -1)
+		directions[Direction.SOUTHWEST] = Vector2i(-1, 1)
+		directions[Direction.SOUTHEAST] = Vector2i(1, 1)
+	
+	# Look for 3x3 areas we can jump into
+	for dir in directions:
+		var offset = directions[dir]
+		
+		# Check positions 2 and 3 cells away for 3x3 centers
+		for distance in [2, 3]:
+			var jump_pos = current_pos + (offset * distance)
+			if is_position_valid(jump_pos) and is_3x3_center(jump_pos, floor_index):
+				# This is a 3x3 center we can jump to
+				neighbors.append(NeighborInfo.new(jump_pos, dir, true, true))
+				break  # Only add the closest 3x3 center in this direction
+	
+	return neighbors
+
+# Enhanced A* initialization with 3x3 jumping
+func initialize_astar_with_3x3():
+	astar_by_floor.clear()
+	for y in range(floors):
+		var astar = AStar2D.new()
+		
+		# Add all points
+		for x in range(columns):
+			for z in range(rows):
+				var point_id = z * columns + x
+				astar.add_point(point_id, Vector2(x, z))
+		
+		# Connect points with enhanced neighbor detection
+		for x in range(columns):
+			for z in range(rows):
+				var current_pos = Vector2i(x, z)
+				var current_point_id = z * columns + x
+				
+				if not is_cell_walkable(current_pos, y):
+					continue
+				
+				var neighbors = get_neighbors_with_3x3_jump(current_pos, y)
+				
+				for neighbor in neighbors:
+					if neighbor.is_walkable:
+						var neighbor_id = neighbor.position.y * columns + neighbor.position.x
+						
+						astar.disconnect_points(current_point_id, neighbor_id)
+						var weight = 1.0
+						
+						if neighbor.is_long_jump:
+							# Higher cost for jumping into 3x3 areas
+							weight = 3.0
+						elif is_diagonal_direction(neighbor.direction):
+							weight = 1.4142
+						
+						astar.connect_points(current_point_id, neighbor_id, true)
+						astar.set_point_weight_scale(neighbor_id, weight)
+		
+		astar_by_floor[y] = astar
+	
+	update_astar_costs()
+
+# Helper function to create 3x3 blue areas for testing
+func create_3x3_blue_area(center: Vector2i, floor: int = 0):
+	for dx in [-1, 0, 1]:
+		for dy in [-1, 0, 1]:
+			var pos = Vector2i(center.x + dx, center.y + dy)
+			if is_position_valid(pos):
+				set_cell_item(Vector3i(pos.x, floor, pos.y), 1)  # Blue cell item
+	
+	# Reinitialize pathfinding to account for new 3x3 area
+	initialize_astar_with_3x3()
+
 
 # Path visualization
 func clear_path_visualization(floor_index: int = 0):

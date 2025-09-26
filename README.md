@@ -56,10 +56,10 @@ The dock allows you to define and manage custom cell states:
 2. **Custom States**:
    - Add new states with the "Add Item State" button.
    - For each state, you can set:
-     - Name
-     - ID (used in scripts to reference the state)
-     - Include in Randomize (toggle)
-     - Randomize Percentage (when included in randomization)
+	 - Name
+	 - ID (used in scripts to reference the state)
+	 - Include in Randomize (toggle)
+	 - Randomize Percentage (when included in randomization)
 
 3. **State Management**:
    - Edit existing states
@@ -221,10 +221,10 @@ extends Node3D
 @onready var player = $Player
 
 func _ready():
-    player.enhanced_gridmap_path = enhanced_gridmap.get_path()
-    player.player_path = player.get_path()
-    player.cell_size = Vector3(2, 2, 2)
-    player.use_diagonal_movement = true
+	player.enhanced_gridmap_path = enhanced_gridmap.get_path()
+	player.player_path = player.get_path()
+	player.cell_size = Vector3(2, 2, 2)
+	player.use_diagonal_movement = true
 ```
 
 This setup allows for click-to-move functionality on your EnhancedGridMap, with the player finding and following optimal paths while avoiding non-walkable cells.
@@ -330,12 +330,12 @@ Override the `get_cell_cost` method in a script extending EnhancedGridMap to imp
 extends EnhancedGridMap
 
 func get_cell_cost(x: int, z: int) -> float:
-    var cell_item = get_cell_item(Vector3i(x, 0, z))
-    match cell_item:
-        0: return 1.0  # Normal cell
-        1: return 2.0  # Slow terrain
-        2: return 0.5  # Fast terrain
-        _: return INF  # Non-walkable
+	var cell_item = get_cell_item(Vector3i(x, 0, z))
+	match cell_item:
+		0: return 1.0  # Normal cell
+		1: return 2.0  # Slow terrain
+		2: return 0.5  # Fast terrain
+		_: return INF  # Non-walkable
 ```
 
 ### Custom Grid Generation
@@ -346,14 +346,14 @@ You can implement custom grid generation by overriding the `generate_grid` metho
 extends EnhancedGridMap
 
 func generate_grid():
-    clear()
-    for x in range(columns):
-        for z in range(rows):
-            var item_index = (x + z) % 2  # Checkerboard pattern
-            set_cell_item(Vector3i(x, 0, z), item_index)
-    update_grid_data()
-    initialize_astar()
-    update_astar_costs()
+	clear()
+	for x in range(columns):
+		for z in range(rows):
+			var item_index = (x + z) % 2  # Checkerboard pattern
+			set_cell_item(Vector3i(x, 0, z), item_index)
+	update_grid_data()
+	initialize_astar()
+	update_astar_costs()
 ```
 
 ## Extending the Player Movement
@@ -366,9 +366,9 @@ You can extend the player movement functionality by overriding or adding methods
 extends "res://addons/enhanced_gridmap/examples/player.gd"
 
 func is_valid_move(from: Vector2i, to: Vector2i) -> bool:
-    # Add custom logic for valid moves
-    var distance = from.distance_to(to)
-    return distance <= 1 and super.is_valid_move(from, to)
+	# Add custom logic for valid moves
+	var distance = from.distance_to(to)
+	return distance <= 1 and super.is_valid_move(from, to)
 ```
 
 ### Additional Interactions
@@ -377,14 +377,14 @@ func is_valid_move(from: Vector2i, to: Vector2i) -> bool:
 extends "res://addons/enhanced_gridmap/examples/player.gd"
 
 func _unhandled_input(event):
-    super._unhandled_input(event)
-    
-    if event.is_action_pressed("interact"):
-        interact_with_current_cell()
+	super._unhandled_input(event)
+	
+	if event.is_action_pressed("interact"):
+		interact_with_current_cell()
 
 func interact_with_current_cell():
-    var cell_item = enhanced_gridmap.get_cell_item(Vector3i(current_position.x, 0, current_position.y))
-    # Add custom interaction logic based on cell_item
+	var cell_item = enhanced_gridmap.get_cell_item(Vector3i(current_position.x, 0, current_position.y))
+	# Add custom interaction logic based on cell_item
 ```
 
 These examples demonstrate how you can build upon the provided player movement script to create more complex game mechanics that integrate seamlessly with the EnhancedGridMap plugin.

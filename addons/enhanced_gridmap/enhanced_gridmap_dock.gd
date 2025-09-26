@@ -38,6 +38,14 @@ var enhanced_gridmap: EnhancedGridMap
 @onready var new_item_spin = $VBoxContainer/ItemManagement/SwapItems/NewItem
 @onready var swap_button = $VBoxContainer/ItemManagement/SwapItems/SwapButton
 
+# 3x3 Experimental GUI
+@onready var create_3x3_button = $VBoxContainer/ThreeByThreeContainer/Create3x3Button
+@onready var center_x_spin = $VBoxContainer/ThreeByThreeContainer/CenterX/SpinBox
+@onready var center_z_spin = $VBoxContainer/ThreeByThreeContainer/CenterZ/SpinBox
+@onready var clear_3x3_button = $VBoxContainer/ThreeByThreeContainer/Clear3x3Button
+@onready var detect_3x3_button = $VBoxContainer/ThreeByThreeContainer/Detect3x3Button
+@onready var three_x_three_info_label = $VBoxContainer/ThreeByThreeContainer/InfoLabel
+
 var row_containers: Array = []
 var cell_options: Array = []
 var custom_item_states: Dictionary = {}
@@ -66,6 +74,10 @@ func connect_signals():
 	end_item_spin.value_changed.connect(_on_end_item_changed)
 	non_walkable_item_spin.value_changed.connect(_on_non_walkable_item_changed)
 	swap_button.pressed.connect(_on_swap_items_pressed)
+	# 3x3 Button
+	create_3x3_button.pressed.connect(_on_create_3x3_pressed)
+	clear_3x3_button.pressed.connect(_on_clear_3x3_pressed)
+	detect_3x3_button.pressed.connect(_on_detect_3x3_pressed)
 
 func initialize_custom_item_states():
 	# Add default item states
@@ -331,6 +343,12 @@ func _update_astar_ui():
 	start_z_spin.max_value = enhanced_gridmap.rows - 1
 	end_x_spin.max_value = enhanced_gridmap.columns - 1
 	end_z_spin.max_value = enhanced_gridmap.rows - 1
+	
+	# Update 3x3 controls
+	center_x_spin.min_value = 1
+	center_x_spin.max_value = enhanced_gridmap.columns - 2
+	center_z_spin.min_value = 1
+	center_z_spin.max_value = enhanced_gridmap.rows - 2
 
 func _update_item_state_ui():
 	normal_item_spin.value = enhanced_gridmap.normal_items[0]
@@ -470,3 +488,79 @@ func _on_swap_items_pressed():
 		var old_item = old_item_spin.value as int
 		var new_item = new_item_spin.value as int
 		enhanced_gridmap.swap_items(old_item, new_item, floor_spin.value as int)
+
+func _on_create_3x3_pressed():
+	if enhanced_gridmap:
+		var center = Vector2i(center_x_spin.value, center_z_spin.value)
+		var current_floor = floor_spin.value as int
+		
+		# Check if the area is valid for 3x3 placement
+		var valid = true
+		var invalid_cells = []
+		
+		for dx in [-1, 0, 1]:
+			for dy in [-1, 0, 1]:
+				var check_pos = Vector2i(center.x + dx, center.y + dy)
+				if not enhanced_gridmap.is_position_valid(check_pos):
+					valid = false
+					invalid_cells.append(check_pos)
+		
+		if valid:
+			enhanced_gridmap.create_3x3_blue_area(center, current_floor)
+			three_x_three_info_label.text = "3x3 area created at " + str(center)
+			print("Created 3x3 blue area at: ", center)
+		else:
+			three_x_three_info_label.text = "Invalid position for 3x3 area"
+			print("Cannot create 3x3 area at ", center, " - out of bounds")
+
+func _on_clear_3x3_pressed():
+	if enhanced_gridmap:
+		var center = Vector2i(center_x_spin.value, center_z_spin.value)
+		var current_floor = floor_spin.value as int
+		
+		# Clear the 3x3 area by setting cells to normal items
+		for dx in [-1, 0, 1]:
+			for dy in [-1, 0, 1]:
+				var pos = Vector2i(center.x + dx, center.y + dy)
+				if enhanced_gridmap.is_position_valid(pos):
+					enhanced_gridmap.set_cell_item(Vector3i(pos.x, current_floor, pos.y), enhanced_gridmap.normal_items[0])
+		
+		enhanced_gridmap.initialize_astar()
+		three_x_three_info_label.text = "3x3 area cleared at " + str(center)
+		print("Cleared 3x3 area at: ", center)
+
+func _on_detect_3x3_pressed():
+	if enhanced_gridmap:
+		var current_floor = floor_spin.value as int
+		var found_centers = []
+		
+		# Scan the entire grid for 3x3 blue areas
+		for x in range(1, enhanced_gridmap.columns - 1):  # Skip edges
+			for z in range(1, enhanced_gridmap.rows - 1):  # Skip edges
+				var pos = Vector2i(x, z)
+				if enhanced_gridmap.is_3x3_center(pos, current_floor):
+					found_centers.append(pos)
+		
+		if found_centers.size() > 0:
+			three_x_three_info_label.text = "Found " + str(found_centers.size()) + " 3x3 areas: " + str(found_centers)
+			print("Detected 3x3 centers at: ", found_centers)
+		else:
+			three_x_three_info_label.text = "No 3x3 areas detected"
+			print("No 3x3 areas found on current floor")
+
+
+func _on_test_3x3_pathfinding():
+	if enhanced_gridmap:
+		var current_floor = floor_spin.value as int
+		var start = Vector2(start_x_spin.value, start_z_spin.value)
+		var end = Vector2(end_x_spin.value, end_z_spin.value)
+		
+		# Use the enhanced 3x3 pathfinding
+		var path = enhanced_gridmap.find_path_with_3x3_jump(start, end, current_floor)
+		
+		if path.is_empty():
+			path_result_label.text = "No path found (including 3x3 jump)"
+		else:
+			path_result_label.text = "Path found with 3x3 support: " + str(path.size()) + " steps"
+			print("3x3 pathfinding result: ", path)
+			
