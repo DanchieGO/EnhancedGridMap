@@ -16,6 +16,20 @@ signal grid_updated
 @export var start_item: int = 2
 @export var end_item: int = 3
 
+# 3x3 Tile Support Properties
+@export var three_by_three_items: Array[int] = [10, 11, 12, 13, 14, 15, 16, 17, 18] # 9 items for 3x3 pattern
+@export var three_by_three_center_item: int = 14  # Center piece item index
+@export var is_3x3_mode: bool = false : set = set_3x3_mode
+
+@export var three_by_three_patterns: Dictionary = {
+	"default": [10, 11, 12, 13, 14, 15, 16, 17, 18],
+	"building": [20, 21, 22, 23, 24, 25, 26, 27, 28],
+	"water": [30, 31, 32, 33, 34, 35, 36, 37, 38]
+}
+
+# Track which cells are part of 3x3 structures
+var three_by_three_centers: Array[Vector2i] = []
+var three_by_three_occupied_cells: Dictionary = {} # Maps cell position to center position
 
 var current_mesh_library: MeshLibrary
 var grid_data: Array = [] # 3D array [floor][row][column]
@@ -826,6 +840,265 @@ func create_3x3_blue_area(center: Vector2i, floor: int = 0):
 	# Reinitialize pathfinding to account for new 3x3 area
 	initialize_astar_with_3x3()
 
+func set_3x3_mode(value: bool):
+	is_3x3_mode = value
+	print("3x3 Mode set to: ", is_3x3_mode)
+
+# Check if a position is valid for 3x3 placement (center position)
+func is_valid_3x3_placement(center_pos: Vector2i, floor: int = 0) -> bool:
+	# Check if center is within valid bounds (at least 1 cell from edges)
+	if center_pos.x < 1 or center_pos.x >= columns - 1 or \
+	   center_pos.y < 1 or center_pos.y >= rows - 1:
+		return false
+	
+	# Check if all 9 cells are available
+	for dx in [-1, 0, 1]:
+		for dy in [-1, 0, 1]:
+			var check_pos = Vector2i(center_pos.x + dx, center_pos.y + dy)
+			var cell_item = get_cell_item(Vector3i(check_pos.x, floor, check_pos.y))
+			
+			# Check if cell is already part of another 3x3 structure
+			if three_by_three_occupied_cells.has(check_pos):
+				return false
+			
+			# Optionally check if cells are currently walkable
+			if cell_item in non_walkable_items:
+				return false
+	
+	return true
+
+# Place a 3x3 structure at the specified center position
+func place_3x3_structure(center_pos: Vector2i, pattern_name: String = "default", floor: int = 0) -> bool:
+	if not is_valid_3x3_placement(center_pos, floor):
+		print("Cannot place 3x3 structure at ", center_pos, " - invalid placement")
+		return false
+	
+	if not three_by_three_patterns.has(pattern_name):
+		print("Unknown 3x3 pattern: ", pattern_name)
+		return false
+	
+	var pattern = three_by_three_patterns[pattern_name]
+	var index = 0
+	
+	# Place the 3x3 pattern
+	for dy in [-1, 0, 1]:
+		for dx in [-1, 0, 1]:
+			var place_pos = Vector2i(center_pos.x + dx, center_pos.y + dy)
+			var item_id = pattern[index]
+			set_cell_item(Vector3i(place_pos.x, floor, place_pos.y), item_id)
+			
+			# Track occupied cells
+			three_by_three_occupied_cells[place_pos] = center_pos
+			index += 1
+	
+	# Add to centers list
+	if not three_by_three_centers.has(center_pos):
+		three_by_three_centers.append(center_pos)
+	
+	# Update pathfinding
+	initialize_astar()
+	print("Placed 3x3 structure '", pattern_name, "' at center: ", center_pos)
+	return true
+
+# Remove a 3x3 structure
+func remove_3x3_structure(center_pos: Vector2i, floor: int = 0) -> bool:
+	if not three_by_three_centers.has(center_pos):
+		print("No 3x3 structure found at center: ", center_pos)
+		return false
+	
+	# Remove the structure and replace with normal items
+	for dx in [-1, 0, 1]:
+		for dy in [-1, 0, 1]:
+			var remove_pos = Vector2i(center_pos.x + dx, center_pos.y + dy)
+			set_cell_item(Vector3i(remove_pos.x, floor, remove_pos.y), normal_items[0])
+			
+			# Remove from occupied cells tracking
+			three_by_three_occupied_cells.erase(remove_pos)
+	
+	# Remove from centers list
+	three_by_three_centers.erase(center_pos)
+	
+	# Update pathfinding
+	initialize_astar()
+	print("Removed 3x3 structure at center: ", center_pos)
+	return true
+
+# Check if a position is the center of a 3x3 structure
+func is_3x3_structure_center(pos: Vector2i) -> bool:
+	return three_by_three_centers.has(pos)
+
+# Check if a position is part of any 3x3 structure
+func is_part_of_3x3_structure(pos: Vector2i) -> bool:
+	return three_by_three_occupied_cells.has(pos)
+
+# Get the center of a 3x3 structure that contains this position
+func get_3x3_structure_center(pos: Vector2i) -> Vector2i:
+	if three_by_three_occupied_cells.has(pos):
+		return three_by_three_occupied_cells[pos]
+	return Vector2i(-1, -1)  # Invalid position
+
+# Check if a position is walkable considering 3x3 mode
+func is_position_walkable_3x3_mode(pos: Vector2i, floor: int = 0) -> bool:
+	if not is_3x3_mode:
+		return is_cell_walkable(pos, floor)
+	
+	# In 3x3 mode, only centers of 3x3 structures are walkable
+	return is_3x3_structure_center(pos)
+
+# Get all valid walkable positions in 3x3 mode
+func get_valid_3x3_positions(floor: int = 0) -> Array[Vector2i]:
+	if not is_3x3_mode:
+		var positions: Array[Vector2i] = []
+		for x in range(columns):
+			for y in range(rows):
+				if is_cell_walkable(Vector2i(x, y), floor):
+					positions.append(Vector2i(x, y))
+		return positions
+	
+	# Return only 3x3 structure centers
+	return three_by_three_centers.duplicate()
+
+# Enhanced pathfinding for 3x3 mode
+func find_path_3x3_mode(start: Vector2, end: Vector2, floor: int = 0) -> Array:
+	if not is_3x3_mode:
+		return find_path(start, end, floor)
+	
+	var start_pos = Vector2i(start)
+	var end_pos = Vector2i(end)
+	
+	# Snap positions to valid 3x3 centers
+	var valid_start = find_nearest_3x3_center(start_pos)
+	var valid_end = find_nearest_3x3_center(end_pos)
+	
+	if valid_start == Vector2i(-1, -1) or valid_end == Vector2i(-1, -1):
+		print("Cannot find valid 3x3 centers for pathfinding")
+		return []
+	
+	# Use custom A* for 3x3 centers only
+	return find_path_between_3x3_centers(valid_start, valid_end, floor)
+
+# Find the nearest 3x3 center to a given position
+func find_nearest_3x3_center(pos: Vector2i) -> Vector2i:
+	if three_by_three_centers.is_empty():
+		return Vector2i(-1, -1)
+	
+	var nearest_center = three_by_three_centers[0]
+	var nearest_distance = pos.distance_to(nearest_center)
+	
+	for center in three_by_three_centers:
+		var distance = pos.distance_to(center)
+		if distance < nearest_distance:
+			nearest_distance = distance
+			nearest_center = center
+	
+	return nearest_center
+
+# Pathfinding between 3x3 centers
+func find_path_between_3x3_centers(start_center: Vector2i, end_center: Vector2i, floor: int = 0) -> Array:
+	if start_center == end_center:
+		return [Vector2(start_center)]
+	
+	# Simple A* implementation for 3x3 centers
+	var astar_3x3 = AStar2D.new()
+	
+	# Add all 3x3 centers as points
+	for i in range(three_by_three_centers.size()):
+		var center = three_by_three_centers[i]
+		astar_3x3.add_point(i, Vector2(center))
+	
+	# Connect centers that are reachable (not blocked by obstacles)
+	for i in range(three_by_three_centers.size()):
+		for j in range(i + 1, three_by_three_centers.size()):
+			var center1 = three_by_three_centers[i]
+			var center2 = three_by_three_centers[j]
+			
+			# Check if path between centers is clear
+			if is_path_clear_between_centers(center1, center2, floor):
+				astar_3x3.connect_points(i, j, true)
+	
+	# Find path
+	var start_id = three_by_three_centers.find(start_center)
+	var end_id = three_by_three_centers.find(end_center)
+	
+	if start_id == -1 or end_id == -1:
+		return []
+	
+	return astar_3x3.get_point_path(start_id, end_id)
+
+# Check if path between two 3x3 centers is clear
+func is_path_clear_between_centers(center1: Vector2i, center2: Vector2i, floor: int = 0) -> bool:
+	# Simple line-of-sight check
+	var distance = center1.distance_to(center2)
+	if distance > 10:  # Maximum connection distance
+		return false
+	
+	# Check intermediate cells for obstacles
+	var steps = int(distance * 2)
+	for i in range(steps + 1):
+		var t = float(i) / float(steps)
+		var check_pos = Vector2i(
+			lerp(center1.x, center2.x, t),
+			lerp(center1.y, center2.y, t)
+		)
+		
+		if is_position_valid(check_pos):
+			var cell_item = get_cell_item(Vector3i(check_pos.x, floor, check_pos.y))
+			if cell_item in non_walkable_items:
+				return false
+	
+	return true
+
+# Validate 3x3 item indices
+func validate_3x3_items():
+	if not mesh_library:
+		return
+	
+	var item_list = mesh_library.get_item_list()
+	var max_index = item_list.back() if not item_list.is_empty() else 0
+	
+	# Validate three_by_three_items
+	three_by_three_items = three_by_three_items.filter(func(item): return item >= 0 and item <= max_index)
+	three_by_three_center_item = clamp(three_by_three_center_item, 0, max_index)
+	
+	# Validate patterns
+	for pattern_name in three_by_three_patterns:
+		var pattern = three_by_three_patterns[pattern_name]
+		for i in range(pattern.size()):
+			pattern[i] = clamp(pattern[i], 0, max_index)
+
+# Auto-detect existing 3x3 structures on the grid
+func detect_existing_3x3_structures(floor: int = 0):
+	three_by_three_centers.clear()
+	three_by_three_occupied_cells.clear()
+	
+	# Scan the grid for potential 3x3 centers
+	for x in range(1, columns - 1):
+		for y in range(1, rows - 1):
+			var center_pos = Vector2i(x, y)
+			if is_existing_3x3_structure(center_pos, floor):
+				three_by_three_centers.append(center_pos)
+				
+				# Mark all cells as occupied
+				for dx in [-1, 0, 1]:
+					for dy in [-1, 0, 1]:
+						var cell_pos = Vector2i(x + dx, y + dy)
+						three_by_three_occupied_cells[cell_pos] = center_pos
+
+# Check if there's an existing 3x3 structure at the center position
+func is_existing_3x3_structure(center_pos: Vector2i, floor: int = 0) -> bool:
+	var center_item = get_cell_item(Vector3i(center_pos.x, floor, center_pos.y))
+	
+	# Check if center matches any known 3x3 center item
+	if center_item == three_by_three_center_item:
+		return true
+	
+	# Check against patterns
+	for pattern_name in three_by_three_patterns:
+		var pattern = three_by_three_patterns[pattern_name]
+		if center_item == pattern[4]:  # Center item is at index 4
+			return true
+	
+	return false
 
 # Path visualization
 func clear_path_visualization(floor_index: int = 0):
@@ -1003,9 +1276,13 @@ func set_cell_rotation(position: Vector3i, mode: int):
 # Mesh library handling
 func _on_mesh_library_changed():
 	validate_item_indices()
+	validate_3x3_items()
 	if auto_generate:
 		generate_grid()
 		_update_cell_option_buttons()
+	# Auto-detect existing structures
+	for floor in range(floors):
+		detect_existing_3x3_structures(floor)
 
 func _update_cell_option_buttons():
 	if not mesh_library:

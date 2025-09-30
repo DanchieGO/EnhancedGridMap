@@ -299,51 +299,87 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="VBoxContainer/ThreeByThreeContainer"]
 layout_mode = 2
-text = "3x3 Blue Areas"
+text = "3x3 Tile System"
 
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer/ThreeByThreeContainer"]
 layout_mode = 2
 
-[node name="CenterX" type="HBoxContainer" parent="VBoxContainer/ThreeByThreeContainer"]
+[node name="ThreeByThreeModeCheck" type="CheckBox" parent="VBoxContainer/ThreeByThreeContainer"]
+layout_mode = 2
+text = "Enable 3x3 Mode"
+tooltip_text = "When enabled, player can only move to centers of 3x3 structures"
+
+[node name="PatternContainer" type="HBoxContainer" parent="VBoxContainer/ThreeByThreeContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/ThreeByThreeContainer/CenterX"]
+[node name="PatternLabel" type="Label" parent="VBoxContainer/ThreeByThreeContainer/PatternContainer"]
+layout_mode = 2
+text = "Pattern:"
+
+[node name="PatternSelector" type="OptionButton" parent="VBoxContainer/ThreeByThreeContainer/PatternContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AddPatternButton" type="Button" parent="VBoxContainer/ThreeByThreeContainer/PatternContainer"]
+layout_mode = 2
+text = "+"
+tooltip_text = "Add new 3x3 pattern"
+
+[node name="PatternEditorContainer" type="VBoxContainer" parent="VBoxContainer/ThreeByThreeContainer"]
+layout_mode = 2
+
+[node name="ItemsContainer" type="VBoxContainer" parent="VBoxContainer/ThreeByThreeContainer"]
+layout_mode = 2
+
+[node name="PlacementContainer" type="VBoxContainer" parent="VBoxContainer/ThreeByThreeContainer"]
+layout_mode = 2
+
+[node name="PlacementLabel" type="Label" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer"]
+layout_mode = 2
+text = "3x3 Placement"
+
+[node name="CenterX" type="HBoxContainer" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer/CenterX"]
 layout_mode = 2
 text = "Center X:"
 
-[node name="SpinBox" type="SpinBox" parent="VBoxContainer/ThreeByThreeContainer/CenterX"]
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer/CenterX"]
 layout_mode = 2
 min_value = 1.0
 max_value = 7.0
 value = 2.0
 
-[node name="CenterZ" type="HBoxContainer" parent="VBoxContainer/ThreeByThreeContainer"]
+[node name="CenterZ" type="HBoxContainer" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/ThreeByThreeContainer/CenterZ"]
+[node name="Label" type="Label" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer/CenterZ"]
 layout_mode = 2
 text = "Center Z:"
 
-[node name="SpinBox" type="SpinBox" parent="VBoxContainer/ThreeByThreeContainer/CenterZ"]
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer/CenterZ"]
 layout_mode = 2
 min_value = 1.0
 max_value = 7.0
 value = 2.0
 
-[node name="ButtonContainer" type="HBoxContainer" parent="VBoxContainer/ThreeByThreeContainer"]
+[node name="ButtonContainer" type="HBoxContainer" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer"]
 layout_mode = 2
 
-[node name="Create3x3Button" type="Button" parent="VBoxContainer/ThreeByThreeContainer"]
+[node name="Create3x3Button" type="Button" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer/ButtonContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Create 3x3"
 
-[node name="Clear3x3Button" type="Button" parent="VBoxContainer/ThreeByThreeContainer"]
+[node name="Clear3x3Button" type="Button" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer/ButtonContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Clear 3x3"
 
-[node name="Detect3x3Button" type="Button" parent="VBoxContainer/ThreeByThreeContainer"]
+[node name="Detect3x3Button" type="Button" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer"]
 layout_mode = 2
-text = "Detect 3x3"
+text = "Detect Existing 3x3"
 
 [node name="InfoLabel" type="Label" parent="VBoxContainer/ThreeByThreeContainer"]
 layout_mode = 2
