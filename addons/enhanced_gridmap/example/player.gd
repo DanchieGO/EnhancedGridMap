@@ -43,7 +43,7 @@ func _ready():
 	# Sync diagonal movement setting with the plugin
 	enhanced_gridmap.set_diagonal_movement(use_diagonal_movement)
 
-	# Position the player at a valid starting position
+	# Position the player at the specified starting position
 	current_position = find_valid_starting_position()
 	update_player_position(current_position)
 	
@@ -52,45 +52,15 @@ func _ready():
 
 func find_valid_starting_position() -> Vector2i:
 	var current_floor = 0  # Assuming floor 0 for simplicity
-	
-	if is_3x3_mode_active():
-		# In 3x3 mode, find a valid 3x3 center or create one
-		var valid_positions = enhanced_gridmap.get_valid_3x3_positions(current_floor)
-		if not valid_positions.is_empty():
-			return valid_positions[0]
-		
-		# Try to create a 3x3 structure if none exist
-		for x in range(1, enhanced_gridmap.columns - 1):
-			for z in range(1, enhanced_gridmap.rows - 1):
-				var center_pos = Vector2i(x, z)
-				if enhanced_gridmap.is_valid_3x3_placement(center_pos, current_floor):
-					enhanced_gridmap.place_3x3_structure(center_pos, "default", current_floor)
-					return center_pos
-		
-		push_error("Cannot find or create valid 3x3 position for player!")
-		return Vector2i(2, 2)  # Fallback
-	else:
-		# Normal mode - find any walkable cell
-		for x in range(enhanced_gridmap.columns):
-			for z in range(enhanced_gridmap.rows):
-				if enhanced_gridmap.is_cell_walkable(Vector2i(x, z), current_floor):
-					return Vector2i(x, z)
-	
-	return Vector2i(2, 2)  # Final fallback
+	var start_pos = Vector2i(2, 2)  # Maps to grid (2,0,2) in 3D coordinates
 
-#func _unhandled_input(event):
-	#
-	#if is_player_moving:
-		#return  # Ignore input if the player is already moving
-#
-	#if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		#var camera = get_viewport().get_camera_3d()
-		#var from = camera.project_ray_origin(event.position)
-		#var to = from + camera.project_ray_normal(event.position) * 1000
-		#
-		#var click_position = raycast_to_grid(from, to)
-		#if click_position != Vector2i(-1, -1):
-			#move_player_to_clicked_position(click_position)
+	# Validate the position for the current mode
+	if is_3x3_mode_active() and not enhanced_gridmap.is_3x3_structure_center(start_pos):
+		push_warning("Starting position ", start_pos, " is not a valid 3x3 structure center.")
+	elif not is_3x3_mode_active() and not enhanced_gridmap.is_cell_walkable(start_pos, current_floor):
+		push_warning("Starting position ", start_pos, " is not a walkable cell.")
+	
+	return start_pos
 
 func _unhandled_input(event):
 	if is_player_moving:
@@ -128,17 +98,19 @@ func _handle_mode_change():
 	if is_3x3_mode_active():
 		# Switching to 3x3 mode
 		if not is_valid_position_for_current_mode(current_position):
-			var valid_pos = find_valid_starting_position()
+			var valid_pos = Vector2i(2, 2)  # Default to (2,0,2)
+			push_warning("Current position invalid for 3x3 mode, reverting to ", valid_pos)
 			current_position = valid_pos
 			update_player_position(current_position)
-			print("Moved player to valid 3x3 position: ", current_position)
+			print("Moved player to: ", current_position)
 	else:
-		# Switching to normal mode - current position should still be valid
+		# Switching to normal mode
 		if not enhanced_gridmap.is_cell_walkable(current_position, 0):
-			var valid_pos = find_valid_starting_position()
+			var valid_pos = Vector2i(2, 2)  # Default to (2,0,2)
+			push_warning("Current position invalid for normal mode, reverting to ", valid_pos)
 			current_position = valid_pos
 			update_player_position(current_position)
-			print("Moved player to valid normal position: ", current_position)
+			print("Moved player to: ", current_position)
 
 func is_valid_position_for_current_mode(pos: Vector2i) -> bool:
 	if is_3x3_mode_active():
@@ -187,9 +159,7 @@ func move_player_to_clicked_position(grid_position: Vector2i):
 	else:
 		print("No valid path found to: ", grid_position)
 		show_invalid_move_feedback(grid_position)
-		
 
-# Enhanced path movement that handles smooth transitions into 3x3 areas
 func move_player_along_path(path: Array):
 	is_player_moving = true
 	var tween = create_tween()
@@ -237,7 +207,7 @@ func show_invalid_move_feedback(pos: Vector2i):
 	enhanced_gridmap.set_cell_item(Vector3i(pos.x, 0, pos.y), feedback_item)
 	
 	var feedback_tween = create_tween()
-	feedback_tween.tween_delay(0.3)
+	feedback_tween.tween_interval(0.3)  # Fixed from tween_delay
 	feedback_tween.tween_callback(func():
 		enhanced_gridmap.set_cell_item(Vector3i(pos.x, 0, pos.y), original_item)
 	)
@@ -250,7 +220,6 @@ func is_valid_target_position(pos: Vector2i) -> bool:
 		# In normal mode, allow movement to any walkable cell
 		return enhanced_gridmap.is_cell_walkable(pos, 0)
 
-# Add a helper function to create test 3x3 areas
 func create_test_3x3_areas():
 	# Create some test 3x3 blue areas
 	enhanced_gridmap.create_3x3_blue_area(Vector2i(2, 2))  # Top-left 3x3
@@ -259,7 +228,6 @@ func create_test_3x3_areas():
 	enhanced_gridmap.create_3x3_blue_area(Vector2i(6, 6))  # Bottom-right 3x3
 	print("Created test 3x3 areas")
 
-# Add these new functions
 func is_valid_3x3_area(center_pos: Vector2i) -> bool:
 	# Check if all 9 cells in the 3x3 area are within bounds and walkable
 	for x in range(-1, 2):  # -1, 0, 1
@@ -348,7 +316,6 @@ func remove_3x3_structure_at_cursor():
 		else:
 			print("No 3x3 structure found at: ", grid_pos)
 
-# Debug methods
 func print_current_mode_info():
 	print("=== Player Mode Info ===")
 	print("Current Position: ", current_position)
