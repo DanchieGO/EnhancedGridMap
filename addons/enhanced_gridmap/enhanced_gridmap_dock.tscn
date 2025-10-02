@@ -367,17 +367,15 @@ value = 2.0
 [node name="ButtonContainer" type="HBoxContainer" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer"]
 layout_mode = 2
 
-[node name="Create3x3Button" type="Button" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer/ButtonContainer"]
+[node name="CreateButton" type="Button" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer/ButtonContainer"]
 layout_mode = 2
-size_flags_horizontal = 3
 text = "Create 3x3"
 
-[node name="Clear3x3Button" type="Button" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer/ButtonContainer"]
+[node name="ClearButton" type="Button" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer/ButtonContainer"]
 layout_mode = 2
-size_flags_horizontal = 3
 text = "Clear 3x3"
 
-[node name="Detect3x3Button" type="Button" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer"]
+[node name="DetectButton" type="Button" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer/ButtonContainer"]
 layout_mode = 2
 text = "Detect Existing 3x3"
 
@@ -385,3 +383,12 @@ text = "Detect Existing 3x3"
 layout_mode = 2
 text = "3x3 Status: Ready"
 autowrap_mode = 2
+
+[node name="WarningLabel" type="Label" parent="VBoxContainer/ThreeByThreeContainer"]
+layout_mode = 2
+text = ""
+autowrap_mode = 2
+
+[node name="PlaceButton" type="Button" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer"]
+layout_mode = 2
+text = "Place Pattern"

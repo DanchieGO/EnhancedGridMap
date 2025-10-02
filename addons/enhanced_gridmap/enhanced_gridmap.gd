@@ -829,16 +829,37 @@ func initialize_astar_with_3x3():
 	
 	update_astar_costs()
 
-# Helper function to create 3x3 blue areas for testing
-func create_3x3_blue_area(center: Vector2i, floor: int = 0):
-	for dx in [-1, 0, 1]:
-		for dy in [-1, 0, 1]:
-			var pos = Vector2i(center.x + dx, center.y + dy)
-			if is_position_valid(pos):
-				set_cell_item(Vector3i(pos.x, floor, pos.y), 1)  # Blue cell item
-	
-	# Reinitialize pathfinding to account for new 3x3 area
-	initialize_astar_with_3x3()
+func create_3x3(center: Vector3i, pattern: Array[int]):
+	if pattern.size() != 9:
+		push_error("3x3 pattern must have 9 items")
+		return
+	var idx = 0
+	for dz in range(-1, 2):   # -1, 0, 1
+		for dx in range(-1, 2):
+			var pos = center + Vector3i(dx, 0, dz)
+			set_cell_item(pos, pattern[idx])
+			idx += 1
+	grid_updated.emit()
+
+
+func clear_3x3(center: Vector3i):
+	for dz in range(-1, 2):
+		for dx in range(-1, 2):
+			var pos = center + Vector3i(dx, 0, dz)
+			set_cell_item(pos, -1)
+	grid_updated.emit()
+
+
+func detect_3x3(center: Vector3i) -> bool:
+	var found = true
+	for dz in range(-1, 2):
+		for dx in range(-1, 2):
+			var pos = center + Vector3i(dx, 0, dz)
+			if get_cell_item(pos) == -1:
+				found = false
+				break
+	return found
+
 
 func set_3x3_mode(value: bool):
 	is_3x3_mode = value
@@ -1050,21 +1071,25 @@ func is_path_clear_between_centers(center1: Vector2i, center2: Vector2i, floor: 
 
 # Validate 3x3 item indices
 func validate_3x3_items():
-	if not mesh_library:
-		return
-	
-	var item_list = mesh_library.get_item_list()
-	var max_index = item_list.back() if not item_list.is_empty() else 0
-	
-	# Validate three_by_three_items
-	three_by_three_items = three_by_three_items.filter(func(item): return item >= 0 and item <= max_index)
-	three_by_three_center_item = clamp(three_by_three_center_item, 0, max_index)
-	
-	# Validate patterns
 	for pattern_name in three_by_three_patterns:
 		var pattern = three_by_three_patterns[pattern_name]
-		for i in range(pattern.size()):
-			pattern[i] = clamp(pattern[i], 0, max_index)
+		while pattern.size() < 9:
+			pattern.append(-1)  # Use -1 for empty cells
+		while pattern.size() > 9:
+			pattern.pop_back()
+		if mesh_library:
+			var item_list = mesh_library.get_item_list()
+			var max_index = item_list[item_list.size() - 1] if not item_list.is_empty() else 0
+			for i in pattern.size():
+				pattern[i] = clamp(pattern[i], -1, max_index)
+	three_by_three_items.resize(9)
+	for i in range(three_by_three_items.size()):
+		if mesh_library:
+			var item_list = mesh_library.get_item_list()
+			var max_index = item_list[item_list.size() - 1] if not item_list.is_empty() else 0
+			three_by_three_items[i] = clamp(three_by_three_items[i], -1, max_index)
+		else:
+			three_by_three_items[i] = -1  # Default to empty if no MeshLibrary
 
 # Auto-detect existing 3x3 structures on the grid
 func detect_existing_3x3_structures(floor: int = 0):
@@ -1083,6 +1108,8 @@ func detect_existing_3x3_structures(floor: int = 0):
 					for dy in [-1, 0, 1]:
 						var cell_pos = Vector2i(x + dx, y + dy)
 						three_by_three_occupied_cells[cell_pos] = center_pos
+
+
 
 # Check if there's an existing 3x3 structure at the center position
 func is_existing_3x3_structure(center_pos: Vector2i, floor: int = 0) -> bool:
