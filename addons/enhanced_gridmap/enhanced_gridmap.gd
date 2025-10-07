@@ -865,61 +865,49 @@ func set_3x3_mode(value: bool):
 	is_3x3_mode = value
 	print("3x3 Mode set to: ", is_3x3_mode)
 
-# Check if a position is valid for 3x3 placement (center position)
-func is_valid_3x3_placement(center_pos: Vector2i, floor: int = 0) -> bool:
-	# Check if center is within valid bounds (at least 1 cell from edges)
-	if center_pos.x < 1 or center_pos.x >= columns - 1 or \
-	   center_pos.y < 1 or center_pos.y >= rows - 1:
-		return false
+func is_valid_3x3_placement(center: Vector2i, floor_index: int) -> bool:
+	var is_valid = true
+	var reasons: Array[String] = []
 	
-	# Check if all 9 cells are available
-	for dx in [-1, 0, 1]:
-		for dy in [-1, 0, 1]:
-			var check_pos = Vector2i(center_pos.x + dx, center_pos.y + dy)
-			var cell_item = get_cell_item(Vector3i(check_pos.x, floor, check_pos.y))
-			
-			# Check if cell is already part of another 3x3 structure
-			if three_by_three_occupied_cells.has(check_pos):
-				return false
-			
-			# Optionally check if cells are currently walkable
-			if cell_item in non_walkable_items:
-				return false
+	# Check if center is within grid bounds
+	if center.x < 1 or center.x >= columns - 1 or center.y < 1 or center.y >= rows - 1:
+		reasons.append("Center out of bounds: " + str(center))
+		is_valid = false
 	
-	return true
+	# Check all 9 cells in the 3x3 area
+	for x in range(-1, 2):
+		for y in range(-1, 2):
+			var check_pos = Vector2i(center.x + x, center.y + y)
+			if not is_position_valid(check_pos):
+				reasons.append("Position out of bounds: " + str(check_pos))
+				is_valid = false
+				continue
+			var cell_item = get_cell_item(Vector3i(check_pos.x, floor_index, check_pos.y))
+			if cell_item in non_walkable_items or cell_item == -1:
+				reasons.append("Non-walkable or empty cell at: " + str(check_pos) + ", item: " + str(cell_item))
+				is_valid = false
+	
+	if not is_valid:
+		print("Cannot place 3x3 structure at ", center, ": ", reasons)
+	return is_valid
 
-# Place a 3x3 structure at the specified center position
-func place_3x3_structure(center_pos: Vector2i, pattern_name: String = "default", floor: int = 0) -> bool:
-	if not is_valid_3x3_placement(center_pos, floor):
-		print("Cannot place 3x3 structure at ", center_pos, " - invalid placement")
-		return false
+
+func place_3x3_structure(center: Vector2i, type: String, floor_index: int):
+	if not is_valid_3x3_placement(center, floor_index):
+		print("Cannot place 3x3 structure at ", center, " - invalid placement")
+		return
 	
-	if not three_by_three_patterns.has(pattern_name):
-		print("Unknown 3x3 pattern: ", pattern_name)
-		return false
+	# Place 3x3 structure (e.g., item ID 6 for the center, 4 for surrounding cells)
+	for x in range(-1, 2):
+		for y in range(-1, 2):
+			var pos = Vector3i(center.x + x, floor_index, center.y + y)
+			var item_id = 6 if x == 0 and y == 0 else 4  # Center: ID 6, others: ID 4
+			set_cell_item(pos, item_id)
 	
-	var pattern = three_by_three_patterns[pattern_name]
-	var index = 0
-	
-	# Place the 3x3 pattern
-	for dy in [-1, 0, 1]:
-		for dx in [-1, 0, 1]:
-			var place_pos = Vector2i(center_pos.x + dx, center_pos.y + dy)
-			var item_id = pattern[index]
-			set_cell_item(Vector3i(place_pos.x, floor, place_pos.y), item_id)
-			
-			# Track occupied cells
-			three_by_three_occupied_cells[place_pos] = center_pos
-			index += 1
-	
-	# Add to centers list
-	if not three_by_three_centers.has(center_pos):
-		three_by_three_centers.append(center_pos)
-	
-	# Update pathfinding
+	if not three_by_three_centers.has(center):
+		three_by_three_centers.append(center)
 	initialize_astar()
-	print("Placed 3x3 structure '", pattern_name, "' at center: ", center_pos)
-	return true
+	print("Placed 3x3 structure at: ", center)
 
 # Remove a 3x3 structure
 func remove_3x3_structure(center_pos: Vector2i, floor: int = 0) -> bool:
@@ -944,9 +932,29 @@ func remove_3x3_structure(center_pos: Vector2i, floor: int = 0) -> bool:
 	print("Removed 3x3 structure at center: ", center_pos)
 	return true
 
-# Check if a position is the center of a 3x3 structure
 func is_3x3_structure_center(pos: Vector2i) -> bool:
-	return three_by_three_centers.has(pos)
+	var is_center = three_by_three_centers.has(pos)
+	if not is_center:
+		# Fallback: Check if center cell has item ID 6
+		var cell_item = get_cell_item(Vector3i(pos.x, 0, pos.y))
+		is_center = cell_item == 6
+		if is_center:
+			print("Detected 3x3 center at ", pos, " via item ID 6")
+			three_by_three_centers.append(pos)
+			initialize_astar()
+	return is_center
+
+func debug_grid_state():
+	print("=== Grid State ===")
+	print("Columns: ", columns, ", Rows: ", rows)
+	print("3x3 Centers: ", three_by_three_centers)
+	for x in range(columns):
+		for y in range(rows):
+			var pos = Vector3i(x, 0, y)
+			var item = get_cell_item(pos)
+			if item != -1:
+				print("Cell (", x, ",", y, "): Item ", item)
+	print("=================")
 
 # Check if a position is part of any 3x3 structure
 func is_part_of_3x3_structure(pos: Vector2i) -> bool:
@@ -1393,4 +1401,28 @@ func place_obstacle(pos: Vector3i, obstacle_item: int, orientation: int) -> bool
 	# Re-initialize A* pathfinding to account for the new obstacle
 	initialize_astar()
 	
+	return true
+
+func is_clear_line_of_sight(center1: Vector2i, center2: Vector2i, floor_index: int = 0) -> bool:
+	if not is_3x3_structure_center(center1) or not is_3x3_structure_center(center2):
+		return false
+	var dx = center2.x - center1.x
+	var dy = center2.y - center1.y
+	var distance = Vector2(dx, dy).length()
+	var is_orthogonal = (dx == 0 and abs(dy) == 4) or (dy == 0 and abs(dx) == 4)
+	var is_diagonal = (abs(dx) == 4 and abs(dy) == 4)
+	if not (is_orthogonal or is_diagonal):
+		return false
+	var steps = max(abs(dx), abs(dy)) if is_diagonal else abs(dx + dy)
+	var step_x = dx / max(1, steps)
+	var step_y = dy / max(1, steps)
+	for i in range(1, steps):
+		var check_x = center1.x + step_x * i
+		var check_y = center1.y + step_y * i
+		var check_pos = Vector3i(round(check_x), floor_index, round(check_y))
+		if not is_position_valid(Vector2i(check_x, check_y)):
+			return false
+		var cell_item = get_cell_item(check_pos)
+		if cell_item in non_walkable_items or cell_item != normal_items[0]:
+			return false
 	return true

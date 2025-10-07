@@ -306,8 +306,8 @@ layout_mode = 2
 
 [node name="ThreeByThreeModeCheck" type="CheckBox" parent="VBoxContainer/ThreeByThreeContainer"]
 layout_mode = 2
-text = "Enable 3x3 Mode"
 tooltip_text = "When enabled, player can only move to centers of 3x3 structures"
+text = "Enable 3x3 Mode"
 
 [node name="PatternContainer" type="HBoxContainer" parent="VBoxContainer/ThreeByThreeContainer"]
 layout_mode = 2
@@ -322,8 +322,8 @@ size_flags_horizontal = 3
 
 [node name="AddPatternButton" type="Button" parent="VBoxContainer/ThreeByThreeContainer/PatternContainer"]
 layout_mode = 2
-text = "+"
 tooltip_text = "Add new 3x3 pattern"
+text = "+"
 
 [node name="PatternEditorContainer" type="VBoxContainer" parent="VBoxContainer/ThreeByThreeContainer"]
 layout_mode = 2
@@ -348,7 +348,6 @@ text = "Center X:"
 [node name="SpinBox" type="SpinBox" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer/CenterX"]
 layout_mode = 2
 min_value = 1.0
-max_value = 7.0
 value = 2.0
 
 [node name="CenterZ" type="HBoxContainer" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer"]
@@ -361,7 +360,6 @@ text = "Center Z:"
 [node name="SpinBox" type="SpinBox" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer/CenterZ"]
 layout_mode = 2
 min_value = 1.0
-max_value = 7.0
 value = 2.0
 
 [node name="ButtonContainer" type="HBoxContainer" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer"]
@@ -379,6 +377,10 @@ text = "Clear 3x3"
 layout_mode = 2
 text = "Detect Existing 3x3"
 
+[node name="PlaceButton" type="Button" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer"]
+layout_mode = 2
+text = "Place Pattern"
+
 [node name="InfoLabel" type="Label" parent="VBoxContainer/ThreeByThreeContainer"]
 layout_mode = 2
 text = "3x3 Status: Ready"
@@ -386,9 +388,4 @@ autowrap_mode = 2
 
 [node name="WarningLabel" type="Label" parent="VBoxContainer/ThreeByThreeContainer"]
 layout_mode = 2
-text = ""
 autowrap_mode = 2
-
-[node name="PlaceButton" type="Button" parent="VBoxContainer/ThreeByThreeContainer/PlacementContainer"]
-layout_mode = 2
-text = "Place Pattern"
