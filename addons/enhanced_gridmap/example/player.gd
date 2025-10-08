@@ -180,9 +180,14 @@ func move_player_to_clicked_position(grid_position: Vector2i):
 		var is_neighbor = is_direct_3x3_neighbor(current_position, grid_position)
 		var is_clear = enhanced_gridmap.is_clear_line_of_sight(current_position, grid_position, 0)
 		print("Move check - Neighbor: ", is_neighbor, ", Clear LOS: ", is_clear, " for target: ", grid_position)
-		if is_neighbor and is_clear:
+		
+		# --- MODIFICATION START ---
+		# Allow the move if it is a neighbor, even if the LOS check fails.
+		# This bypasses the block caused by non-walkable cells between 3x3 centers.
+		if is_neighbor:
 			path = [Vector2(current_position), Vector2(grid_position)]
-		else:
+		elif not is_neighbor or not is_clear:
+		# --- MODIFICATION END ---
 			print("Not a direct neighbor or path blocked: ", grid_position)
 			show_invalid_move_feedback(grid_position)
 			return
@@ -196,6 +201,7 @@ func move_player_to_clicked_position(grid_position: Vector2i):
 	else:
 		print("No valid path found to: ", grid_position)
 		show_invalid_move_feedback(grid_position)
+		
 
 func move_player_along_path(path: Array):
 	is_player_moving = true
@@ -329,9 +335,9 @@ func get_available_moves() -> Array[Vector2i]:
 		]
 		for dir in directions:
 			var target_pos = current_position + dir
+			# *** REMOVE THE LINE-OF-SIGHT CHECK HERE ***
 			if enhanced_gridmap.is_position_valid(target_pos) and \
-			   enhanced_gridmap.is_3x3_structure_center(target_pos) and \
-			   enhanced_gridmap.is_clear_line_of_sight(current_position, target_pos, 0):
+			   enhanced_gridmap.is_3x3_structure_center(target_pos): # <-- MODIFIED: Removed the LOS check
 				available.append(target_pos)
 				print("Valid move to: ", target_pos)
 	else:
