@@ -1,0 +1,7 @@
+[gd_resource type="BoxMesh" load_steps=2 format=3 uid="uid://cqt7jmw5iy8i3"]
+
+[ext_resource type="Material" path="res://assets/meshlibrary/mat_normal.tres" id="1_ligig"]
+
+[resource]
+material = ExtResource("1_ligig")
+size = Vector3(1.9, 0.5, 1.9)

@@ -1,0 +1,7 @@
+[gd_resource type="BoxMesh" load_steps=2 format=3 uid="uid://ce0pw03k7l2av"]
+
+[ext_resource type="Material" path="res://assets/meshlibrary/mat_hover.tres" id="1_dlils"]
+
+[resource]
+material = ExtResource("1_dlils")
+size = Vector3(1.9, 0.5, 1.9)

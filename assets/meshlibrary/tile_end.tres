@@ -1,0 +1,7 @@
+[gd_resource type="BoxMesh" load_steps=2 format=3 uid="uid://drtpmpcq8b56y"]
+
+[ext_resource type="Material" path="res://assets/meshlibrary/mat_end.tres" id="1_fui7c"]
+
+[resource]
+material = ExtResource("1_fui7c")
+size = Vector3(1.9, 0.5, 1.9)
