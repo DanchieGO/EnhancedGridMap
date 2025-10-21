@@ -1,35 +1,30 @@
 extends Node3D
 
-@export var grid_map_path: NodePath  # Direct path to GridMap node
-@export var is_3x3_mode: bool = true  # Keep 3x3 detection
-@export var free_movement: bool = true  # Allow free movement
+@export var grid_map_path: NodePath
+@export var is_3x3_mode: bool = false
 @export var cell_size: Vector3 = Vector3(2, 2, 2)
 @export var cell_offset: Vector3 = Vector3.ZERO
+@export var movement_speed: float = 0.3  # Time to move one cell
 
 var grid_map: GridMap
 var current_position: Vector2i
 var is_moving: bool = false
+var current_path: Array[Vector2i] = []
+var path_index: int = 0
 
 func _ready():
-	# Get direct reference to GridMap
 	grid_map = get_node_or_null(grid_map_path)
 	if not grid_map:
-		push_error("GridMap not found. Please set the correct grid_map_path.")
+		push_error("GridMap not found.")
 		return
 	
-	# Wait for complete initialization
-	await get_tree().process_frame
 	await get_tree().process_frame
 	
-	# Set exact starting position
 	current_position = Vector2i(2, 2)
 	position = grid_to_world(current_position)
 	global_position = position
 	
-	print("Player initialized at grid: ", current_position, " world: ", position)
-	print("GridMap dimensions: ", grid_map.columns, "x", grid_map.rows)
-	print("GridMap cell_size: ", grid_map.cell_size)
-	print("Movement mode: FREE (no restrictions)")
+	print("Player initialized at: ", current_position)
 
 func _unhandled_input(event):
 	if is_moving or not grid_map:
@@ -45,56 +40,71 @@ func _unhandled_input(event):
 		var clicked_grid_pos = raycast_to_grid(from, to)
 
 		if clicked_grid_pos != Vector2i(-1, -1):
-			handle_move_request(clicked_grid_pos)
+			start_movement_to(clicked_grid_pos)
 
-func handle_move_request(target_pos: Vector2i):
+func start_movement_to(target_pos: Vector2i):
+	#"""Start moving to target position using pathfinding"""
 	if not grid_map:
 		return
 	
-	# Check bounds
+	# Check if target is valid
 	if target_pos.x < 0 or target_pos.x >= grid_map.columns or target_pos.y < 0 or target_pos.y >= grid_map.rows:
-		print("Invalid target: Outside GridMap bounds")
+		print("Target outside grid bounds")
 		return
 	
-	# Check if walkable
 	var cell_item = grid_map.get_cell_item(Vector3i(target_pos.x, 0, target_pos.y))
 	if cell_item == -1 or grid_map.non_walkable_items.has(cell_item):
-		print("Invalid target: Not walkable at ", target_pos)
+		print("Target not walkable")
 		return
 	
-	# If free_movement is enabled, don't check 3x3 centers
-	if not free_movement and is_3x3_mode:
-		if target_pos not in grid_map.three_by_three_centers:
-			print("Invalid target: Not a 3x3 center")
-			return
+	# Find path to target
+	var path = []
+	if grid_map.has_method("find_path"):
+		path = grid_map.find_path(current_position, target_pos)
+	else:
+		# Fallback: direct path
+		path = [current_position, target_pos]
 	
-	move_to_position(target_pos)
-
-func find_path_to_target(target_pos: Vector2i) -> Array:
-	if not grid_map:
-		return []
-	
-	# Simple pathfinding - just return direct target for now
-	# You could implement A* pathfinding here if needed
-	return [current_position, target_pos]
-
-func move_to_position(target_pos: Vector2i):
-	if not grid_map:
+	if path.size() <= 1:
+		print("Already at target or no path found")
 		return
-		
+	
+	print("Path found with ", path.size(), " steps: ", path)
+	
+	# Start following the path
+	current_path = path
+	path_index = 0
+	move_to_next_step()
+
+func move_to_next_step():
+	#"""Move to the next step in the path"""
+	if path_index >= current_path.size() - 1:
+		# Reached the end of the path
+		current_path.clear()
+		path_index = 0
+		is_moving = false
+		print("Reached destination")
+		return
+	
+	path_index += 1
+	var next_pos = current_path[path_index]
+	
 	is_moving = true
 	var tween = create_tween()
 	tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	
-	var world_pos = grid_to_world(target_pos)
-	print("Moving to grid: ", target_pos, " world: ", world_pos)
-	
-	tween.tween_property(self, "position", world_pos, 0.4)
+	var world_pos = grid_to_world(next_pos)
+	tween.tween_property(self, "position", world_pos, movement_speed)
 	
 	await tween.finished
-	current_position = target_pos
+	current_position = next_pos
 	is_moving = false
-	print("Moved to: ", current_position, " world pos: ", position)
+	
+	print("Moved to step ", path_index, "/", current_path.size() - 1, ": ", current_position)
+	
+	# Continue to next step
+	if path_index < current_path.size() - 1:
+		move_to_next_step()
 
 func raycast_to_grid(from: Vector3, to: Vector3) -> Vector2i:
 	if not grid_map:
@@ -108,11 +118,9 @@ func raycast_to_grid(from: Vector3, to: Vector3) -> Vector2i:
 		var grid_coords = grid_map.local_to_map(result.position)
 		var grid_pos = Vector2i(grid_coords.x, grid_coords.z)
 		
-		# Validate the position is within bounds
 		if grid_pos.x < 0 or grid_pos.x >= grid_map.columns or grid_pos.y < 0 or grid_pos.y >= grid_map.rows:
 			return Vector2i(-1, -1)
 		
-		# Check if walkable
 		var cell_item = grid_map.get_cell_item(Vector3i(grid_pos.x, 0, grid_pos.y))
 		if cell_item == -1 or grid_map.non_walkable_items.has(cell_item):
 			return Vector2i(-1, -1)
@@ -125,12 +133,7 @@ func grid_to_world(grid_pos: Vector2i) -> Vector3:
 	if not grid_map:
 		return Vector3.ZERO
 	
-	# Pattern: Each grid step = +2 units in world space
-	# Base calculation: (2,2) -> (5,0,5)
-	# Therefore: base = (5,0,5) - (2,2)*2 = (1,0,1)
 	var base_offset = Vector3(1.0, 0.0, 1.0)
-	
-	# Apply +2 multiplier for each grid step
 	var world_pos = Vector3(
 		base_offset.x + grid_pos.x * 2.0,
 		0.0,
@@ -138,17 +141,3 @@ func grid_to_world(grid_pos: Vector2i) -> Vector3:
 	)
 	
 	return world_pos + cell_offset
-
-func highlight_valid_centers():
-	if not grid_map or not is_3x3_mode:
-		return
-	
-	# Clear previous highlights
-	for center in grid_map.three_by_three_centers:
-		var pos = Vector3i(center.x, 0, center.y)
-		var current_item = grid_map.get_cell_item(pos)
-		if current_item != grid_map.hover_item:
-			# Store original item and set hover item
-			grid_map.set_cell_item(pos, grid_map.hover_item)
-	
-	print("Highlighted ", grid_map.three_by_three_centers.size(), " valid 3x3 centers")

@@ -6,19 +6,22 @@ class_name GridManager
 
 func _ready():
 	if grid_map:
+		# Initialize pathfinding
+		if grid_map.has_method("initialize_astar"):
+			grid_map.initialize_astar()
+		
 		# Initialize 3x3 mode if enabled
 		if grid_map.is_3x3_mode:
 			detect_3x3_structures()
 			print("Detected ", grid_map.three_by_three_centers.size(), " 3x3 structures")
 			
-			# Set player starting position to first 3x3 center
 			if not grid_map.three_by_three_centers.is_empty():
 				var start_pos = grid_map.three_by_three_centers[0]
-				player.grid_position = Vector3i(start_pos.x, 0, start_pos.y)
-				player.global_position = grid_map.map_to_local(player.grid_position)
+				player.current_position = start_pos
+				player.global_position = grid_map.map_to_local(Vector3i(start_pos.x, 0, start_pos.y))
 				print("Player positioned at 3x3 center: ", start_pos)
 		
-		print("Grid ready")
+		print("Grid ready with pathfinding")
 	else:
 		print("Error: GridMap not found!")
 
