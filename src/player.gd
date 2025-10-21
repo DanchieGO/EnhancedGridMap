@@ -1,7 +1,8 @@
 extends Node3D
 
 @export var grid_map_path: NodePath  # Direct path to GridMap node
-@export var is_3x3_mode: bool = true
+@export var is_3x3_mode: bool = true  # Keep 3x3 detection
+@export var free_movement: bool = true  # Allow free movement
 @export var cell_size: Vector3 = Vector3(2, 2, 2)
 @export var cell_offset: Vector3 = Vector3.ZERO
 
@@ -22,11 +23,13 @@ func _ready():
 	
 	# Set exact starting position
 	current_position = Vector2i(2, 2)
-	position = Vector3(5.0, 0.0, 5.0)
-	global_position = Vector3(5.0, 0.0, 5.0)  # Ensure global position is set
+	position = grid_to_world(current_position)
+	global_position = position
 	
 	print("Player initialized at grid: ", current_position, " world: ", position)
+	print("GridMap dimensions: ", grid_map.columns, "x", grid_map.rows)
 	print("GridMap cell_size: ", grid_map.cell_size)
+	print("Movement mode: FREE (no restrictions)")
 
 func _unhandled_input(event):
 	if is_moving or not grid_map:
@@ -47,20 +50,33 @@ func _unhandled_input(event):
 func handle_move_request(target_pos: Vector2i):
 	if not grid_map:
 		return
-		
-	# In 3x3 mode, check if target is a valid 3x3 center
-	if is_3x3_mode and grid_map.has_method("detect_3x3_structures"):
-		if target_pos in grid_map.three_by_three_centers:
-			move_to_position(target_pos)
-		else:
-			print("Invalid target: Not a 3x3 center.")
-	else:
-		# Normal mode - check if walkable
-		var item = grid_map.get_cell_item(Vector3i(target_pos.x, 0, target_pos.y))
-		if item != -1 and not grid_map.non_walkable_items.has(item):
-			move_to_position(target_pos)
-		else:
-			print("Invalid target: Cell is not walkable.")
+	
+	# Check bounds
+	if target_pos.x < 0 or target_pos.x >= grid_map.columns or target_pos.y < 0 or target_pos.y >= grid_map.rows:
+		print("Invalid target: Outside GridMap bounds")
+		return
+	
+	# Check if walkable
+	var cell_item = grid_map.get_cell_item(Vector3i(target_pos.x, 0, target_pos.y))
+	if cell_item == -1 or grid_map.non_walkable_items.has(cell_item):
+		print("Invalid target: Not walkable at ", target_pos)
+		return
+	
+	# If free_movement is enabled, don't check 3x3 centers
+	if not free_movement and is_3x3_mode:
+		if target_pos not in grid_map.three_by_three_centers:
+			print("Invalid target: Not a 3x3 center")
+			return
+	
+	move_to_position(target_pos)
+
+func find_path_to_target(target_pos: Vector2i) -> Array:
+	if not grid_map:
+		return []
+	
+	# Simple pathfinding - just return direct target for now
+	# You could implement A* pathfinding here if needed
+	return [current_position, target_pos]
 
 func move_to_position(target_pos: Vector2i):
 	if not grid_map:
@@ -71,6 +87,8 @@ func move_to_position(target_pos: Vector2i):
 	tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	
 	var world_pos = grid_to_world(target_pos)
+	print("Moving to grid: ", target_pos, " world: ", world_pos)
+	
 	tween.tween_property(self, "position", world_pos, 0.4)
 	
 	await tween.finished
@@ -88,7 +106,18 @@ func raycast_to_grid(from: Vector3, to: Vector3) -> Vector2i:
 
 	if result:
 		var grid_coords = grid_map.local_to_map(result.position)
-		return Vector2i(grid_coords.x, grid_coords.z)
+		var grid_pos = Vector2i(grid_coords.x, grid_coords.z)
+		
+		# Validate the position is within bounds
+		if grid_pos.x < 0 or grid_pos.x >= grid_map.columns or grid_pos.y < 0 or grid_pos.y >= grid_map.rows:
+			return Vector2i(-1, -1)
+		
+		# Check if walkable
+		var cell_item = grid_map.get_cell_item(Vector3i(grid_pos.x, 0, grid_pos.y))
+		if cell_item == -1 or grid_map.non_walkable_items.has(cell_item):
+			return Vector2i(-1, -1)
+		
+		return grid_pos
 		
 	return Vector2i(-1, -1)
 
@@ -109,3 +138,17 @@ func grid_to_world(grid_pos: Vector2i) -> Vector3:
 	)
 	
 	return world_pos + cell_offset
+
+func highlight_valid_centers():
+	if not grid_map or not is_3x3_mode:
+		return
+	
+	# Clear previous highlights
+	for center in grid_map.three_by_three_centers:
+		var pos = Vector3i(center.x, 0, center.y)
+		var current_item = grid_map.get_cell_item(pos)
+		if current_item != grid_map.hover_item:
+			# Store original item and set hover item
+			grid_map.set_cell_item(pos, grid_map.hover_item)
+	
+	print("Highlighted ", grid_map.three_by_three_centers.size(), " valid 3x3 centers")

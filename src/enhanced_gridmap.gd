@@ -2,8 +2,8 @@
 class_name EnhancedGridMap
 extends GridMap
 
-@export var columns: int = 12
-@export var rows: int = 12
+@export var columns: int = 120
+@export var rows: int = 120
 @export var floors: int = 3
 @export var auto_generate: bool = false
 
